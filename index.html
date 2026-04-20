@@ -795,8 +795,10 @@ function growthBarHTML() {
 
 function screenWelcome() {
   const visitCount = loadVisitDays().length;
-  // const alreadyStarted = hasStartedToday(); // TODO: 完成後に制限を戻す
-  const startBtn = `<button class="btn" onclick="startFlow()">はじめる ✨</button>`;
+  const alreadyStarted = hasStartedToday();
+  const startBtn = alreadyStarted
+    ? `<button class="btn" disabled style="opacity:0.45;cursor:default;">今日はもう記録したよ 🌙</button>`
+    : `<button class="btn" onclick="startFlow()">はじめる ✨</button>`;
   return `
     <div style="text-align:center">
       <div class="app-title">きもちのおへや</div>
@@ -1153,6 +1155,7 @@ function stopHearts() {
 function startBgMusic() {
   if (bgAudio) return;
   bgAudio = new Audio('music_for_video-calming-94427.mp3');
+  bgAudio.preload = 'none';
   bgAudio.loop = true;
   bgAudio.volume = 0.5;
   bgAudio.play().catch(() => {});
@@ -1164,6 +1167,7 @@ function startFireMusic() {
   stopBgMusic();
   stopLetterMusic();
   fireAudio = new Audio('restfuldreamingtunes-sounds-for-meditation-rainy-evening-by-the-fireplace-265450.mp3');
+  fireAudio.preload = 'none';
   fireAudio.loop = true;
   fireAudio.volume = 0.65;
   fireAudio.play().catch(() => {});
@@ -1175,6 +1179,7 @@ function startLetterMusic() {
   stopBgMusic();
   stopFireMusic();
   letterAudio = new Audio('clavier-music-calm-classical-piano-291012.mp3');
+  letterAudio.preload = 'none';
   letterAudio.loop = true;
   letterAudio.volume = 0.65;
   letterAudio.play().catch(() => {});
@@ -1185,6 +1190,7 @@ function stopLetterMusic() {
 function startWaveMusic() {
   stopBgMusic();
   waveAudio = new Audio('wave-music.flac');
+  waveAudio.preload = 'none';
   waveAudio.loop = true;
   waveAudio.volume = 0.7;
   waveAudio.play().catch(() => {});
