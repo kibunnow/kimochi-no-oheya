@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<!--
+  ================================================================
+  きもちのおへや
+  ================================================================
+
+  【BGM・音源クレジット】
+
+  焚き火シーン BGM:
+    Title  : Sounds for Meditation: Rainy Evening by the Fireplace
+    Artist : RestfulDreamingTunes
+    Source : Pixabay  https://pixabay.com
+    License: Pixabay Content License
+
+  手紙シーン BGM:
+    Title  : Calm Classical Piano
+    Artist : Clavier-Music
+    Source : Pixabay  https://pixabay.com
+    License: Pixabay Content License
+
+  通常 BGM:
+    Title  : Calming
+    Artist : music_for_video
+    Source : Pixabay  https://pixabay.com
+    License: Pixabay Content License
+
+  何もしない部屋 波の音:
+    Title  : Beach Ocean Waves / alkaibeach
+    Creator: jasinski
+    Source : OpenGameArt / Freesound
+    License: CC0 (Public Domain)
+
+  ================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>きもちのおへや 🐻</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow-x:hidden; }
+
+body {
+  font-family: 'Hiragino Maru Gothic Pro', 'Rounded Mplus 1c', 'Yu Gothic', sans-serif;
+  background: #FFF8F2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image: radial-gradient(circle, #FFD6E8 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+  opacity:0.25;
+  z-index:0;
+  pointer-events:none;
+}
+
+#app {
+  position:relative;
+  z-index:1;
+  width:100%;
+  max-width:440px;
+  min-height:100vh;
+  padding:28px 20px 40px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  transition: opacity 0.28s ease;
+}
+#app.fading { opacity:0; }
+
+/* Sky overlay */
+#sky-overlay {
+  position:fixed;
+  inset:0;
+  background: linear-gradient(180deg, #B8E0FF 0%, #E0F4FF 40%, #FFF8F2 100%);
+  opacity:0;
+  pointer-events:none;
+  z-index:0;
+  transition: opacity 0.6s ease;
+}
+
+/* Hug screen overlay */
+#hug-overlay {
+  position:fixed;
+  inset:0;
+  background: radial-gradient(ellipse at center, #FFE8EE 0%, #FFF0F5 50%, #FFF8F2 100%);
+  opacity:0;
+  pointer-events:none;
+  z-index:0;
+  transition: opacity 0.8s ease;
+}
+
+/* ── Title ── */
+.app-title { font-size:1.9rem; font-weight:bold; color:#5C4033; text-align:center; }
+.app-sub   { font-size:0.88rem; color:#9E7B6E; text-align:center; margin-top:4px; margin-bottom:4px; }
+
+/* ── Character ── */
+.char-wrap { display:flex; flex-direction:column; align-items:center; margin:14px 0; }
+
+.char-svg {
+  filter: drop-shadow(0 8px 18px rgba(0,0,0,0.13));
+  animation: float 3.2s ease-in-out infinite;
+}
+.char-svg.sm  { width:110px; height:110px; }
+.char-svg.lg  { width:170px; height:170px; }
+
+@keyframes float {
+  0%,100% { transform:translateY(0); }
+  50%      { transform:translateY(-10px); }
+}
+@keyframes bounce-in {
+  0%   { transform:scale(0.4); opacity:0; }
+  65%  { transform:scale(1.12); opacity:1; }
+  100% { transform:scale(1); }
+}
+.char-svg.intro {
+  animation: bounce-in 0.65s cubic-bezier(.36,.07,.19,.97) both,
+             float 3.2s ease-in-out 0.65s infinite;
+}
+
+/* Hug bear breathing */
+@keyframes hug-breathe {
+  0%,100% { transform:scale(1); filter:drop-shadow(0 8px 24px rgba(255,150,180,0.3)); }
+  50%      { transform:scale(1.06); filter:drop-shadow(0 12px 32px rgba(255,150,180,0.5)); }
+}
+.hug-bear {
+  animation: hug-breathe 1.9s ease-in-out infinite;
+  cursor:pointer;
+}
+
+/* Floating hearts */
+@keyframes heart-float {
+  0%   { opacity:0.9; transform:translateY(0) scale(0.8) rotate(-5deg); }
+  100% { opacity:0;   transform:translateY(-65vh) scale(1.3) rotate(10deg); }
+}
+.heart-el {
+  position:fixed;
+  pointer-events:none;
+  z-index:999;
+}
+
+/* ── Speech bubble ── */
+.bubble {
+  background:white;
+  border-radius:20px;
+  padding:14px 20px;
+  font-size:1rem;
+  line-height:1.7;
+  text-align:center;
+  color:#5C4033;
+  box-shadow:0 4px 18px rgba(0,0,0,0.08);
+  position:relative;
+  max-width:310px;
+  margin:0 auto 20px;
+}
+.bubble::after {
+  content:'';
+  position:absolute;
+  top:-11px; left:50%;
+  transform:translateX(-50%);
+  border:11px solid transparent;
+  border-bottom-color:white;
+  border-top:none;
+}
+/* 吹き出し下向き（焚き火シーン用） */
+.bubble-down::after {
+  top:auto;
+  bottom:-11px;
+  border-top:11px solid white;
+  border-bottom-color:transparent;
+}
+
+/* ── Mood grid ── */
+.mood-grid {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  width:100%;
+  max-width:360px;
+  margin:0 auto;
+}
+.mood-btn {
+  background:white;
+  border:2px solid #F0E0D8;
+  border-radius:14px;
+  padding:10px 6px;
+  cursor:pointer;
+  transition:all 0.18s;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);
+  font-family:inherit;
+}
+.mood-btn:hover  { transform:translateY(-3px); box-shadow:0 6px 16px rgba(0,0,0,0.1); }
+.mood-btn:active { transform:scale(0.96); }
+.mood-btn.pos { border-color:#B5EABC; }
+.mood-btn.pos:hover { background:#F0FBF2; }
+.mood-btn.neg { border-color:#FFCCC4; }
+.mood-btn.neg:hover { background:#FFF5F3; }
+.m-emoji { font-size:1.55rem; }
+.m-label { font-size:0.73rem; font-weight:bold; color:#5C4033; }
+
+/* ── Input ── */
+.input-box {
+  width:100%; max-width:320px;
+  border:2px solid #F0D8CC;
+  border-radius:14px;
+  padding:14px;
+  font-size:0.9rem;
+  font-family:inherit;
+  resize:none;
+  background:white;
+  color:#5C4033;
+  outline:none;
+  transition:border-color 0.2s;
+  margin-bottom:8px;
+  min-height:110px;
+}
+.input-box:focus { border-color:#FF9F8E; }
+.skip-note { font-size:0.76rem; color:#BBA098; text-align:center; margin-bottom:14px; }
+
+/* ── Buttons ── */
+.btn {
+  background:linear-gradient(135deg,#FF9F8E,#FF7A6A);
+  color:white;
+  border:none;
+  border-radius:30px;
+  padding:13px 34px;
+  font-size:0.93rem;
+  font-family:inherit;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 4px 14px rgba(255,122,106,0.4);
+  transition:all 0.18s;
+  display:block;
+  margin:6px auto;
+}
+.btn:hover  { transform:translateY(-2px); box-shadow:0 7px 18px rgba(255,122,106,0.5); }
+.btn:active { transform:scale(0.97); }
+.btn-ghost {
+  background:white;
+  color:#FF7A6A;
+  border:2px solid #FFB5A7;
+  box-shadow:none;
+}
+.btn-ghost:hover { background:#FFF5F3; box-shadow:0 4px 12px rgba(255,122,106,0.15); }
+.btn-sm { padding:9px 22px; font-size:0.84rem; }
+
+/* ── Effect screen ── */
+.effect-wrap {
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:14px;
+  min-height:50vh;
+  justify-content:center;
+}
+.effect-note { font-size:0.9rem; color:#9E7B6E; text-align:center; }
+.effect-card {
+  background:white;
+  border-radius:14px;
+  padding:14px 20px;
+  max-width:280px;
+  font-size:0.9rem;
+  color:#5C4033;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  line-height:1.6;
+  text-align:center;
+  transition:all 1.3s ease;
+}
+#letter-icon {
+  font-size:5rem;
+  display:block;
+  text-align:center;
+  transition:all 1.6s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+
+/* ── Sparkle ── */
+.sparkle-el {
+  position:fixed;
+  pointer-events:none;
+  z-index:999;
+  animation:sparkle-up 1.4s ease-out forwards;
+}
+@keyframes sparkle-up {
+  0%   { opacity:1; transform:translateY(0) scale(0.6) rotate(0deg); }
+  100% { opacity:0; transform:translateY(-160px) scale(1.5) rotate(40deg); }
+}
+
+/* ── Hug screen ── */
+.hug-screen {
+  width:100%;
+  min-height:80vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  padding:20px;
+  position:relative;
+  z-index:1;
+}
+.hug-tap-hint {
+  font-size:0.76rem;
+  color:#CCA8B8;
+  margin-top:22px;
+  letter-spacing:0.04em;
+}
+
+/* ── Memory screen ── */
+.mem-header { text-align:center; margin-bottom:14px; }
+.mem-header h2 { font-size:1.25rem; color:#5C4033; }
+.mem-header p  { font-size:0.81rem; color:#9E7B6E; margin-top:4px; }
+.mem-list {
+  width:100%;
+  max-width:360px;
+  max-height:55vh;
+  overflow-y:auto;
+  padding:4px 2px;
+}
+.mem-card {
+  background:white;
+  border-radius:14px;
+  padding:12px 16px;
+  margin-bottom:10px;
+  border-left:4px solid #9ADE9A;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);
+}
+.mem-date  { font-size:0.7rem;  color:#BBA098; margin-bottom:3px; }
+.mem-text  { font-size:0.87rem; color:#5C4033; line-height:1.55; }
+.mem-mood  { font-size:0.78rem; color:#7CB87A; margin-top:5px; }
+.mem-empty { text-align:center; padding:28px 0; color:#BBA098; font-size:0.9rem; line-height:1.9; }
+
+/* ── Growth counter ── */
+.growth-bar {
+  display:flex; align-items:center; gap:8px; justify-content:center;
+  margin:0 0 16px; flex-wrap:wrap;
+}
+.growth-icons { font-size:1.05rem; letter-spacing:2px; }
+.growth-count {
+  background:white; border-radius:20px; padding:4px 14px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.07); font-weight:bold; color:#7CB87A;
+  font-size:0.84rem;
+}
+
+/* ── Tiny win ── */
+.btn-green {
+  background:linear-gradient(135deg,#7DD87D,#55BE55);
+  color:white; box-shadow:0 4px 14px rgba(85,190,85,0.35);
+}
+.btn-green:hover { box-shadow:0 7px 18px rgba(85,190,85,0.45); }
+
+.tiny-hint {
+  display:flex; flex-wrap:wrap; gap:8px;
+  justify-content:center; margin-bottom:14px; max-width:320px;
+}
+.tiny-chip {
+  background:white; border:1.5px solid #C8E8C8; border-radius:20px;
+  padding:5px 13px; font-size:0.78rem; color:#55A855; cursor:pointer;
+  transition:all 0.15s; font-family:inherit;
+}
+.tiny-chip:hover { background:#F0FBF0; transform:scale(1.04); }
+
+/* ── Milestone ── */
+@keyframes milestone-pop {
+  0%  { transform:scale(0.5); opacity:0; }
+  70% { transform:scale(1.08); }
+  100%{ transform:scale(1);   opacity:1; }
+}
+.milestone-banner {
+  background:linear-gradient(135deg,#FFF8D0,#FFFBE8);
+  border:2px solid #FFD700; border-radius:18px;
+  padding:14px 20px; text-align:center; max-width:300px;
+  margin:12px auto 0;
+  animation:milestone-pop 0.6s cubic-bezier(.36,.07,.19,.97) forwards;
+  box-shadow:0 4px 16px rgba(255,215,0,0.22);
+}
+.milestone-title { font-size:1.05rem; font-weight:bold; color:#B8900A; }
+.milestone-msg   { font-size:0.87rem; color:#5C4033; margin-top:5px; line-height:1.6; }
+
+/* ── Calendar ── */
+.cal-nav {
+  display:flex; align-items:center; gap:14px; justify-content:center; margin-bottom:10px;
+}
+.cal-nav-btn {
+  background:white; border:1.5px solid #F0D8CC; border-radius:10px;
+  padding:5px 14px; font-size:1rem; cursor:pointer; color:#9E7B6E;
+  font-family:inherit; transition:all 0.15s; line-height:1;
+}
+.cal-nav-btn:hover:not(:disabled) { background:#FFF5F3; }
+.cal-nav-btn:disabled { opacity:0.3; cursor:default; }
+.cal-month-label {
+  font-size:1rem; font-weight:bold; color:#5C4033; min-width:96px; text-align:center;
+}
+.cal-grid {
+  display:grid; grid-template-columns:repeat(7,1fr);
+  gap:4px; width:100%; max-width:350px;
+}
+.cal-dow {
+  font-size:0.68rem; color:#9E7B6E; text-align:center; padding:3px 0; font-weight:bold;
+}
+.cal-cell {
+  aspect-ratio:1; background:white; border-radius:10px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  box-shadow:0 1px 4px rgba(0,0,0,0.05); position:relative;
+}
+.cal-empty { background:transparent !important; box-shadow:none !important; }
+.cal-today { border:2px solid #FFB5A7; }
+.cal-visited { background:#FFF0F5; }
+.cal-num { font-size:0.72rem; color:#5C4033; line-height:1; }
+.cal-stamp { font-size:0.95rem; line-height:1; margin-top:1px; }
+
+/* ── Played-today button ── */
+.btn-done {
+  background:white; color:#CCA8B8; border:2px solid #F0D8D8;
+  box-shadow:none; cursor:default;
+}
+.btn-done:hover { transform:none; box-shadow:none; }
+
+/* ── CSS Campfire scene ── */
+.fire-scene {
+  position:relative; width:100%; max-width:440px;
+  height:52vh; flex-shrink:0;
+  background:linear-gradient(to bottom, #1a1520, #100e14 60%, #0c0908);
+  border-radius:16px;
+}
+.fire-letter {
+  position:absolute; left:50%; top:20px;
+  margin-left:-30px;
+  font-size:3.6rem; line-height:1;
+  filter:drop-shadow(0 4px 12px rgba(200,100,0,0.35));
+  transform-origin:center; z-index:2;
+}
+.fire-letter.falling {
+  animation: paperFall 4.2s ease-in-out forwards;
+}
+@keyframes paperFall {
+  0%   { transform:translate(0, 0)          rotate(-6deg); opacity:1; }
+  35%  { transform:translate(-18px, 15vh)   rotate(8deg);  opacity:1; }
+  70%  { transform:translate(16px, 30vh)    rotate(-4deg); opacity:0.9; }
+  100% { transform:translate(0, 42vh) scale(0.12) rotate(12deg); opacity:0; }
+}
+
+.fire-wrap {
+  position:absolute; left:50%; bottom:-40px;
+  transform:translateX(-50%);
+  width:190px; height:160px;
+  display:flex; align-items:flex-end;
+  justify-content:center; z-index:1;
+}
+.fire-glow {
+  position:absolute; bottom:0;
+  width:220px; height:150px; border-radius:50%;
+  background:radial-gradient(circle, rgba(255,180,78,0.45), rgba(255,93,33,0.14) 42%, transparent 72%);
+  filter:blur(8px);
+  animation:fireGlow 1.8s ease-in-out infinite alternate;
+}
+@keyframes fireGlow {
+  from { opacity:0.65; transform:scale(0.96); }
+  to   { opacity:1;    transform:scale(1.06); }
+}
+.flame {
+  position:absolute; bottom:38px;
+  width:62px; height:92px;
+  border-radius:56% 44% 58% 42%;
+  background:linear-gradient(to top, #ff7a1a, #ffcf5d 60%, #fff1aa);
+  transform-origin:bottom center;
+  filter:drop-shadow(0 0 18px rgba(255,127,39,0.8));
+  animation:flameAnim 0.9s ease-in-out infinite alternate;
+}
+.flame.two {
+  width:44px; height:70px; bottom:42px;
+  background:linear-gradient(to top, #ffb000, #fff0a8);
+  animation-delay:0.18s;
+}
+.flame.three {
+  width:50px; height:82px; bottom:38px;
+  background:linear-gradient(to top, #ff4b22, #ffc24f 65%, #fff4b0);
+  animation-delay:0.32s;
+}
+@keyframes flameAnim {
+  from { transform:scaleY(0.95) rotate(-5deg); opacity:0.86; }
+  to   { transform:scaleY(1.08) rotate(5deg);  opacity:1; }
+}
+.fire-logs {
+  position:absolute; bottom:28px;
+  width:140px; height:28px; z-index:2;
+}
+.fire-log {
+  position:absolute; left:16px; bottom:6px;
+  width:110px; height:18px; border-radius:999px;
+  background:linear-gradient(to right, #5a321e, #9a5b32, #4b2618);
+  box-shadow:inset 0 2px 4px rgba(255,220,150,0.25);
+}
+.fire-log.a { transform:rotate(13deg); }
+.fire-log.b { transform:rotate(-13deg); }
+.fire-spark {
+  position:absolute; bottom:130px; left:50%;
+  width:5px; height:5px; border-radius:50%;
+  background:#ffd98b; opacity:0;
+  animation:sparkAnim 2.2s ease-in-out infinite;
+}
+.fire-spark.s1 { margin-left:-34px; animation-delay:0s; }
+.fire-spark.s2 { margin-left:12px;  animation-delay:0.6s; }
+.fire-spark.s3 { margin-left:38px;  animation-delay:1.1s; }
+@keyframes sparkAnim {
+  0%   { transform:translateY(0) scale(0.4); opacity:0; }
+  25%  { opacity:1; }
+  100% { transform:translateY(-90px) scale(0.1); opacity:0; }
+}
+
+/* ── Tiny win notebook card ── */
+.tiny-card {
+  background:white; border-radius:14px; padding:12px 16px;
+  margin-bottom:10px; border-left:4px solid #7DD87D;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);
+}
+.tiny-date { font-size:0.7rem; color:#BBA098; margin-bottom:3px; }
+.tiny-text { font-size:0.87rem; color:#5C4033; line-height:1.55; }
+
+/* ── 何もしない部屋 ── */
+.nothing-room {
+  position:fixed; inset:0; z-index:100;
+  overflow:hidden; cursor:pointer;
+  background:linear-gradient(to bottom, #17182f, #22284d 48%, #303d63);
+  font-family:inherit; color:rgba(255,248,226,0.92);
+}
+.nr-sky-glow {
+  position:absolute; inset:0; pointer-events:none; z-index:0;
+  background:
+    radial-gradient(circle at 72% 18%, rgba(255,244,201,0.14), transparent 24%),
+    radial-gradient(circle at 30% 36%, rgba(166,205,255,0.13), transparent 36%),
+    linear-gradient(to bottom, rgba(255,255,255,0.02), transparent 55%);
+}
+.nr-moon-wrap {
+  position:absolute; right:18%; top:9%;
+  width:68px; height:68px; z-index:2;
+  animation:nrMoonFloat 7s ease-in-out infinite alternate;
+}
+.nr-moon-glow {
+  position:absolute; inset:-26px; border-radius:50%;
+  background:radial-gradient(circle, rgba(255,244,201,0.26), transparent 68%);
+  filter:blur(2px);
+  animation:nrMoonGlow 5.8s ease-in-out infinite alternate;
+}
+.nr-moon {
+  position:absolute; inset:11px; border-radius:50%;
+  background:radial-gradient(circle at 34% 30%, #fffbe7, #fff4c9 64%, #f1d997 100%);
+  box-shadow:0 0 24px rgba(255,240,180,0.44);
+}
+@keyframes nrMoonFloat {
+  from { transform:translateY(0); }
+  to   { transform:translateY(8px); }
+}
+@keyframes nrMoonGlow {
+  from { opacity:0.64; transform:scale(0.96); }
+  to   { opacity:1;    transform:scale(1.06); }
+}
+.nr-stars { position:absolute; inset:0; z-index:1; pointer-events:none; }
+.nr-star {
+  position:absolute; width:3px; height:3px;
+  border-radius:50%; background:rgba(255,248,226,0.9);
+  box-shadow:0 0 8px rgba(255,248,226,0.5);
+  animation:nrTwinkle 4s ease-in-out infinite alternate;
+}
+.nr-star.s1 { left:15%; top:12%; animation-delay:0s; }
+.nr-star.s2 { left:37%; top:20%; width:2px; height:2px; animation-delay:1.2s; }
+.nr-star.s3 { left:70%; top:28%; width:2px; height:2px; animation-delay:0.7s; }
+.nr-star.s4 { left:22%; top:36%; width:2px; height:2px; animation-delay:2s; }
+.nr-star.s5 { left:82%; top:10%; width:2px; height:2px; animation-delay:1.7s; }
+.nr-star.s6 { left:55%; top:15%; width:2px; height:2px; animation-delay:0.4s; }
+@keyframes nrTwinkle {
+  from { opacity:0.24; transform:scale(0.85); }
+  to   { opacity:0.9;  transform:scale(1.15); }
+}
+.nr-message {
+  position:absolute; top:28%; left:7%; right:7%;
+  z-index:4; text-align:left;
+}
+.nr-bear-line {
+  font-size:1.1rem; line-height:1.9;
+  text-shadow:0 2px 10px rgba(0,0,0,0.3);
+}
+.nr-ocean {
+  position:absolute; left:0; right:0; bottom:0;
+  height:46%; z-index:3; overflow:hidden;
+  background:linear-gradient(to bottom, rgba(55,87,126,0.25), rgba(10,32,56,0.96));
+}
+.nr-moon-reflection {
+  position:absolute; right:18%; top:16px;
+  width:44px; height:60%; border-radius:50%;
+  background:linear-gradient(to bottom, rgba(255,239,175,0.38), rgba(255,239,175,0.06), transparent);
+  filter:blur(8px); opacity:0.55; transform:skewX(-8deg);
+  animation:nrReflection 5.5s ease-in-out infinite alternate;
+}
+@keyframes nrReflection {
+  from { transform:skewX(-8deg) translateX(-5px) scaleX(0.88); opacity:0.38; }
+  to   { transform:skewX(7deg)  translateX(5px)  scaleX(1.05); opacity:0.62; }
+}
+.nr-wave {
+  position:absolute; left:-120px;
+  width:140%; height:130px;
+  border-radius:43% 57% 52% 48% / 52% 44% 56% 48%;
+  opacity:0.78;
+}
+.nr-wave::before, .nr-wave::after {
+  content:""; position:absolute; border-radius:50%; background:inherit; opacity:0.86;
+}
+.nr-wave::before { width:55%; height:108px; left:10%; top:-24px; }
+.nr-wave::after  { width:65%; height:120px; right:10%; top:-32px; }
+.nr-wave.one   { bottom:86px; background:rgba(95,151,188,0.28); animation:nrWave1 9s  ease-in-out infinite alternate; }
+.nr-wave.two   { bottom:38px; background:rgba(69,124,168,0.42); animation:nrWave2 11s ease-in-out infinite alternate; }
+.nr-wave.three { bottom:-28px; background:rgba(24,77,125,0.76); animation:nrWave3 13s ease-in-out infinite alternate; }
+@keyframes nrWave1 {
+  from { transform:translateX(-18px) translateY(0)   rotate(0); }
+  to   { transform:translateX(34px)  translateY(10px) rotate(1.2deg); }
+}
+@keyframes nrWave2 {
+  from { transform:translateX(28px)  translateY(8px)  rotate(0.8deg); }
+  to   { transform:translateX(-28px) translateY(-4px) rotate(-0.8deg); }
+}
+@keyframes nrWave3 {
+  from { transform:translateX(-34px) translateY(4px)  rotate(-0.5deg); }
+  to   { transform:translateX(24px)  translateY(-8px) rotate(0.6deg); }
+}
+.nr-foam-line {
+  position:absolute; left:-80px; bottom:168px;
+  width:140%; height:34px; border-radius:50%;
+  border-top:2px solid rgba(255,248,226,0.24);
+  filter:blur(0.3px); opacity:0.55;
+  animation:nrFoam 10s ease-in-out infinite alternate;
+}
+@keyframes nrFoam {
+  from { transform:translateX(-16px) translateY(0);  opacity:0.36; }
+  to   { transform:translateX(36px)  translateY(8px); opacity:0.68; }
+}
+.nr-footer {
+  position:absolute; left:0; right:0; bottom:22px; z-index:5;
+  text-align:center; font-size:0.8rem;
+  color:rgba(255,248,226,0.55); letter-spacing:0.02em; pointer-events:none;
+}
+</style>
+</head>
+<body>
+<div id="sky-overlay"></div>
+<div id="hug-overlay"></div>
+<div id="app"></div>
+
+<script>
+// ================================================================
+// DATA — お母さんクマのみ
+// ================================================================
+const CHAR = {
+  bc:'#D4A5A5', ac:'#B08080', sc:'#FFB6C1',
+  greet:'来てくれたんだ。\nよかったらゆっくりしてってよ。\n今の気持ちはどうかな？',
+  posVariants:[
+    '本当に良かった！\nあれ、今日輝いてない？\nいい気分だねぇ。ふふ',
+  ],
+  neg:'今のきもち\n聞かせてくれて、ありがとう。\nきもちに向き合うって\n勇気いるじゃない？',
+  negUnknown:'理由がなくても\nつらいのは本物だよ。\nそのきもち、だいじ。',
+};
+
+const MOODS = [
+  { id:'happy',    label:'嬉しい',       emoji:'😊', type:'pos' },
+  { id:'fun',      label:'楽しい',       emoji:'😄', type:'pos' },
+  { id:'proud',    label:'達成感',       emoji:'🌟', type:'pos' },
+  { id:'grateful', label:'感謝',         emoji:'🙏', type:'pos' },
+  { id:'sad',      label:'悲しい',       emoji:'😢', type:'neg' },
+  { id:'nervous',  label:'緊張してる',   emoji:'😰', type:'neg' },
+  { id:'angry',    label:'イライラ',     emoji:'😤', type:'neg' },
+  { id:'tired',    label:'疲れた',       emoji:'😴', type:'neg' },
+  { id:'anxious',  label:'不安',         emoji:'😟', type:'neg' },
+  { id:'lonely',   label:'寂しい',       emoji:'🥺', type:'neg' },
+  { id:'foggy',    label:'なんとなく重い', emoji:'🌫️', type:'neg' },
+  { id:'numb',     label:'理由なくつらい', emoji:'😔', type:'neg' },
+];
+
+// ================================================================
+// STATE
+// ================================================================
+let S = { mood:null, text:'', tinyText:'' };
+let hugHeartInterval = null;
+let calMonth = new Date();
+let fireAudio = null;
+let bgAudio = null;
+let letterAudio = null;
+let waveAudio = null;
+
+// ================================================================
+// VISIT TRACKING
+// ================================================================
+const VISIT_KEY = 'kimochi_visits_v1';
+const START_KEY = 'kimochi_last_start_v1';
+
+function getTodayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function loadVisitDays() {
+  try { return JSON.parse(localStorage.getItem(VISIT_KEY) || '[]'); }
+  catch { return []; }
+}
+function recordVisit() {
+  const today = getTodayStr();
+  const days = loadVisitDays();
+  if (!days.includes(today)) {
+    days.push(today);
+    localStorage.setItem(VISIT_KEY, JSON.stringify(days));
+  }
+  return days.length;
+}
+function hasStartedToday() {
+  return localStorage.getItem(START_KEY) === getTodayStr();
+}
+function markStartedToday() {
+  localStorage.setItem(START_KEY, getTodayStr());
+}
+
+// ================================================================
+// BEAR SVG — 通常ポーズ
+// ================================================================
+function bearSVG() {
+  const { bc, ac, sc } = CHAR;
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <!-- Ears -->
+    <circle cx="58"  cy="73" r="31" fill="${bc}"/>
+    <circle cx="142" cy="73" r="31" fill="${bc}"/>
+    <circle cx="58"  cy="73" r="19" fill="${ac}"/>
+    <circle cx="142" cy="73" r="19" fill="${ac}"/>
+    <!-- Head -->
+    <circle cx="100" cy="118" r="77" fill="${bc}"/>
+    <!-- Muzzle -->
+    <ellipse cx="100" cy="138" rx="33" ry="26" fill="${ac}" opacity="0.55"/>
+    <!-- Eyes -->
+    <circle cx="80"  cy="106" r="9" fill="#3D2B1F"/>
+    <circle cx="120" cy="106" r="9" fill="#3D2B1F"/>
+    <circle cx="83"  cy="103" r="3" fill="white"/>
+    <circle cx="123" cy="103" r="3" fill="white"/>
+    <!-- Nose -->
+    <ellipse cx="100" cy="130" rx="7" ry="5" fill="#3D2B1F"/>
+    <!-- Mouth -->
+    <path d="M88 139 Q100 150 112 139" stroke="#3D2B1F" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <!-- Cheeks -->
+    <circle cx="68"  cy="124" r="14" fill="${sc}" opacity="0.48"/>
+    <circle cx="132" cy="124" r="14" fill="${sc}" opacity="0.48"/>
+    <!-- Mom's bow -->
+    <ellipse cx="76"  cy="50" rx="21" ry="13" fill="#FF9EB8" transform="rotate(-25,76,50)"/>
+    <ellipse cx="124" cy="50" rx="21" ry="13" fill="#FF9EB8" transform="rotate(25,124,50)"/>
+    <circle cx="100" cy="50" r="9" fill="#FF7FA0"/>
+  </svg>`;
+}
+
+// hugBearSVG は bearSVG() を使用するため削除
+
+// ================================================================
+// NAVIGATION
+// ================================================================
+function go(screenFn, onMount) {
+  stopHearts();
+  if (!bgAudio && !fireAudio && !letterAudio) startBgMusic();
+  const app = document.getElementById('app');
+  app.classList.add('fading');
+  setTimeout(() => {
+    app.innerHTML = screenFn();
+    app.classList.remove('fading');
+    if (onMount) requestAnimationFrame(() => requestAnimationFrame(onMount));
+  }, 290);
+}
+
+// ================================================================
+// SCREENS
+// ================================================================
+function growthBarHTML() {
+  const count = loadTinyWins().length;
+  if (count === 0) return '';
+  const flowers = Math.min(Math.floor(count / 5), 10);
+  const sprouts = count % 5;
+  const icons = '🌸'.repeat(flowers) + '🌱'.repeat(sprouts) || '🌱';
+  return `<div class="growth-bar">
+    <span class="growth-icons">${icons}</span>
+    <span class="growth-count">${count}個の頑張りが積み重なってるよ</span>
+  </div>`;
+}
+
+function screenWelcome() {
+  const visitCount = loadVisitDays().length;
+  // const alreadyStarted = hasStartedToday(); // TODO: 完成後に制限を戻す
+  const startBtn = `<button class="btn" onclick="startFlow()">はじめる ✨</button>`;
+  return `
+    <div style="text-align:center">
+      <div class="app-title">きもちのおへや</div>
+      <div class="app-sub">気持ちを聞かせてね 🌸</div>
+      <div style="font-size:0.8rem;color:#BBA098;margin-top:4px;">🐾 来た日数：${visitCount}日</div>
+    </div>
+    <div class="char-wrap">
+      <div style="position:relative;width:170px;height:170px;">
+        <button onclick="go(screenCalendar)" style="position:absolute;top:4px;left:-30px;background:none;border:none;cursor:pointer;padding:0;z-index:2;line-height:0;">
+          <img src="karenda25942_color.png" width="42" height="42" alt="">
+        </button>
+        <div class="char-svg lg intro" style="width:100%;height:100%;">${bearSVG()}</div>
+        <button onclick="go(screenMemory)" style="position:absolute;top:4px;right:-30px;background:none;border:none;cursor:pointer;padding:0;z-index:2;line-height:0;">
+          <img src="note12821_color.png" width="42" height="42" alt="">
+        </button>
+        <button onclick="enterDoNothing()" style="position:absolute;bottom:4px;right:-30px;background:none;border:none;cursor:pointer;padding:0;z-index:2;line-height:0;">
+          <img src="gazopcsp004.png" width="42" height="42" alt="">
+        </button>
+      </div>
+    </div>
+    ${growthBarHTML()}
+    <div class="bubble">${nl2br(CHAR.greet)}</div>
+    ${startBtn}
+    <button class="btn btn-green btn-ghost" style="margin-top:6px;background:white;color:#55A855;border-color:#B5E8B5;" onclick="go(screenTinyWin)">ちいさな頑張りを記録する 🌱</button>
+  `;
+}
+
+function screenMood() {
+  const btns = MOODS.map(m => `
+    <button class="mood-btn ${m.type}" onclick="pickMood('${m.id}')">
+      <span class="m-emoji">${m.emoji}</span>
+      <span class="m-label">${m.label}</span>
+    </button>`).join('');
+  return `
+    <div class="char-wrap" style="margin-bottom:8px">
+      <div class="char-svg sm">${bearSVG()}</div>
+    </div>
+    <div class="bubble">今の気分はどう？</div>
+    <div class="mood-grid">${btns}</div>
+  `;
+}
+
+function screenInput() {
+  const prompt = S.mood.type === 'pos'
+    ? 'お？なになに？？<br>もっと聞かせてよ！<br><span style="font-size:0.82rem;color:#BBA098">（書かなくても大丈夫だよ）</span>'
+    : 'そっか…。<br>よかったら聞かせてほしいかも。<br><span style="font-size:0.82rem;color:#BBA098">（書かなくても大丈夫だよ）</span>';
+  return `
+    <div class="char-wrap" style="margin-bottom:8px">
+      <div class="char-svg sm">${bearSVG()}</div>
+    </div>
+    <div class="bubble">${prompt}</div>
+    <textarea class="input-box" id="txt" placeholder="今日のことを書いてみてね..."
+      oninput="S.text=this.value">${esc(S.text)}</textarea>
+    <p class="skip-note">※書かなくても「おくる」を押せるよ</p>
+    <button class="btn" onclick="submitText()">おくる ✉️</button>
+    <button class="btn btn-ghost btn-sm" style="margin-top:4px" onclick="go(screenMood)">← 気分を選びなおす</button>
+  `;
+}
+
+function screenEffect() {
+  return `<div class="effect-wrap" id="ew"></div>`;
+}
+
+function screenHug() {
+  return `
+    <div class="hug-screen" onclick="endHug()">
+      <p class="effect-note" style="margin-bottom:20px;">
+        本当におつかれさま。<br>今日はゆっくりしてね。<br>このまま少し<br>いっしょに休む？
+      </p>
+      <div class="hug-bear" style="width:190px;height:190px;">
+        ${bearSVG()}
+      </div>
+      <p class="hug-tap-hint">タップして進む</p>
+    </div>
+  `;
+}
+
+function screenMessage() {
+  const unknownNeg = (S.mood.id === 'foggy' || S.mood.id === 'numb');
+  const msg = S.mood.type === 'pos'
+            ? CHAR.posVariants[Math.floor(Math.random() * CHAR.posVariants.length)]
+            : unknownNeg ? CHAR.negUnknown
+            : CHAR.neg;
+  return `
+    <div class="char-wrap">
+      <div class="char-svg lg">${bearSVG()}</div>
+    </div>
+    <div class="bubble">${nl2br(msg)}</div>
+    <button class="btn" onclick="resetFlow()">もどる 🏠</button>
+    <button class="btn btn-ghost" style="margin-top:4px" onclick="go(screenMemory)">ノートを見る 📖</button>
+  `;
+}
+
+function screenMemory() {
+  const mems = loadMems();
+  const wins = loadTinyWins();
+  const memItems = mems.length === 0
+    ? `<div class="mem-empty">まだ記録がないよ。<br>嬉しいこと・楽しいことを<br>書いてみてね 🌸</div>`
+    : [...mems].reverse().map(m => `
+        <div class="mem-card">
+          <div class="mem-date">${m.date} · ${m.moodEmoji} ${m.moodLabel}</div>
+          <div class="mem-text">${esc(m.text)}</div>
+        </div>`).join('');
+  const winItems = wins.length === 0
+    ? `<div class="mem-empty">まだ記録がないよ。<br>どんな小さなことでも<br>書いてみてね 🌱</div>`
+    : [...wins].reverse().map(w => `
+        <div class="tiny-card">
+          <div class="tiny-date">${w.date}</div>
+          <div class="tiny-text">🌱 ${esc(w.text)}</div>
+        </div>`).join('');
+  return `
+    <div class="mem-header">
+      <h2>📖 ノートを見る</h2>
+    </div>
+    <div style="width:100%;max-width:360px;margin-bottom:8px;">
+      <div style="font-size:0.92rem;font-weight:bold;color:#9ADE9A;margin-bottom:6px;">✨ 思い出ノート</div>
+      <div class="mem-list" style="max-height:30vh;">${memItems}</div>
+    </div>
+    <div style="width:100%;max-width:360px;margin-bottom:8px;">
+      <div style="font-size:0.92rem;font-weight:bold;color:#7DD87D;margin-bottom:6px;">🌱 頑張りノート（${wins.length}個）</div>
+      <div class="mem-list" style="max-height:30vh;">${winItems}</div>
+    </div>
+    <button class="btn btn-ghost" style="margin-top:8px" onclick="go(screenWelcome)">もどる</button>
+  `;
+}
+
+// ================================================================
+// TINY WIN SCREENS
+// ================================================================
+function screenTinyWin() {
+  const hints = ['水を飲んだ','外を見た','ごはんを食べた','早起きした',
+                 'お風呂に入れた','好きな音楽を聴いた','ひと休みした',
+                 '今日も起きた','深呼吸した','少し動いた'];
+  const chips = hints.map(h =>
+    `<button class="tiny-chip" onclick="fillTinyHint('${h}')">${h}</button>`
+  ).join('');
+  return `
+    <div class="char-wrap" style="margin-bottom:8px">
+      <div class="char-svg sm">${bearSVG()}</div>
+    </div>
+    <div class="bubble">
+      どんなことができたかな？<br>
+      <span style="font-size:0.82rem;color:#BBA098">どんな小さなことでもいいよ。</span>
+    </div>
+    <div class="tiny-hint">${chips}</div>
+    <textarea class="input-box" id="tiny-txt" placeholder="例）水を飲んだ　外の空気を吸った..."
+      oninput="S.tinyText=this.value" style="min-height:88px;border-color:#C8E8C8;"></textarea>
+    <button class="btn btn-green" onclick="submitTinyWin()">えらいを記録する 🌱</button>
+    <button class="btn btn-ghost btn-sm" style="margin-top:4px" onclick="go(screenWelcome)">もどる</button>
+  `;
+}
+
+function fillTinyHint(text) {
+  const el = document.getElementById('tiny-txt');
+  if (el) { el.value = text; S.tinyText = text; el.focus(); }
+}
+
+function submitTinyWin() {
+  const el = document.getElementById('tiny-txt');
+  const text = el ? el.value.trim() : '';
+  if (!text) {
+    if (el) { el.style.borderColor = '#FFB5A7'; el.focus(); }
+    return;
+  }
+  const count = saveTinyWin(text);
+  const milestone = checkMilestone(count);
+  go(() => screenTinyWinResult(text, count, milestone));
+}
+
+function screenTinyWinResult(text, count, milestone) {
+  const milestoneHTML = milestone ? `
+    <div class="milestone-banner">
+      <div class="milestone-title">✨ ${esc(milestone.title)} ✨</div>
+      <div class="milestone-msg">${nl2br(milestone.msg)}</div>
+    </div>` : '';
+  return `
+    <div class="char-wrap">
+      <div class="char-svg lg intro">${bearSVG()}</div>
+    </div>
+    <div class="bubble">
+      ええ！<br>
+      「${esc(text)}」 できたんだね。<br>よかったら<br>ギューしてもいい？
+    </div>
+    ${milestoneHTML}
+    <button class="btn" onclick="resetFlow()">もどる 🏠</button>
+    <button class="btn btn-ghost btn-sm" style="margin-top:4px" onclick="go(screenMemory)">ノートを見る 📖</button>
+  `;
+}
+
+// ================================================================
+// FLOW LOGIC
+// ================================================================
+function startFlow() { markStartedToday(); recordVisit(); S.text=''; S.mood=null; go(screenMood); }
+
+function pickMood(id) {
+  S.mood = MOODS.find(m => m.id === id);
+  S.text = '';
+  go(screenInput);
+}
+
+function submitText() {
+  const el = document.getElementById('txt');
+  if (el) S.text = el.value.trim();
+
+  if (S.mood.type === 'pos') {
+    if (S.text) saveMem();
+    go(screenEffect, runLetterEffect);
+  } else {
+    go(screenEffect, runFireEffect);
+  }
+}
+
+function resetFlow() {
+  S.mood = null; S.text = '';
+  go(screenWelcome);
+}
+
+// ================================================================
+// LETTER EFFECT (positive)
+// ================================================================
+function runLetterEffect() {
+  const ew = document.getElementById('ew');
+  if (!ew) return;
+  const displayText = S.text || 'きもちをおくったよ！';
+  ew.innerHTML = `
+    <p class="effect-note">きもちが空へ届くよ ✨</p>
+    <div class="effect-card" id="lcard">${esc(displayText)}</div>
+    <div id="letter-icon">✉️</div>
+    <p class="hug-tap-hint" id="letter-tap" style="opacity:0;transition:opacity 1s;margin-top:16px;">タップですすむ</p>
+  `;
+  startLetterMusic();
+  document.getElementById('sky-overlay').style.opacity = '1';
+  setTimeout(() => {
+    const icon  = document.getElementById('letter-icon');
+    const lcard = document.getElementById('lcard');
+    if (icon) {
+      icon.style.transform = 'translateY(-280px) scale(0.4) rotate(25deg)';
+      icon.style.opacity = '0';
+      icon.style.fontSize = '7rem';
+    }
+    if (lcard) {
+      lcard.style.opacity = '0';
+      lcard.style.transform = 'translateY(-60px)';
+    }
+    for (let i = 0; i < 28; i++) setTimeout(makeSparkle, i * 85);
+    setTimeout(() => {
+      const tapHint = document.getElementById('letter-tap');
+      if (tapHint) tapHint.style.opacity = '1';
+      const ewEl = document.getElementById('ew');
+      if (ewEl) {
+        ewEl.style.cursor = 'pointer';
+        ewEl.onclick = () => {
+          ewEl.onclick = null;
+          stopLetterMusic();
+          document.getElementById('sky-overlay').style.opacity = '0';
+          go(screenMessage);
+        };
+      }
+    }, 2300);
+  }, 700);
+}
+
+function makeSparkle() {
+  const picks = ['✨','⭐','🌟','💫','✦','＊','·','✸','♡'];
+  const el = document.createElement('div');
+  el.className = 'sparkle-el';
+  el.textContent = picks[Math.floor(Math.random() * picks.length)];
+  el.style.left = (8 + Math.random() * 84) + 'vw';
+  el.style.top  = (10 + Math.random() * 65) + 'vh';
+  el.style.fontSize = (0.7 + Math.random() * 1.5) + 'rem';
+  el.style.animationDuration = (0.8 + Math.random() * 1.1) + 's';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2800);
+}
+
+// ================================================================
+// FIRE EFFECT (negative)
+// ================================================================
+function runFireEffect() {
+  const ew = document.getElementById('ew');
+  if (!ew) return;
+  ew.style.justifyContent = 'flex-start';
+  ew.style.gap = '12px';
+
+  ew.innerHTML = `
+    <p class="effect-note">今のきもち、<br>焚き火にそっとくべてみよ。</p>
+    <div class="bubble bubble-down" style="margin:8px auto 0;">焚き火ってさ、<br>ボーッといつまでも見れない？</div>
+    <div class="fire-scene">
+      <div class="fire-letter" id="fire-paper">✉️</div>
+      <div class="fire-wrap">
+        <div class="fire-glow"></div>
+        <div class="fire-spark s1"></div>
+        <div class="fire-spark s2"></div>
+        <div class="fire-spark s3"></div>
+        <div class="flame one"></div>
+        <div class="flame two"></div>
+        <div class="flame three"></div>
+        <div class="fire-logs">
+          <div class="fire-log a"></div>
+          <div class="fire-log b"></div>
+        </div>
+      </div>
+    </div>
+    <p class="hug-tap-hint" id="fire-tap" style="opacity:0;transition:opacity 1s;">タップですすむ</p>
+  `;
+
+  startFireMusic();
+
+  setTimeout(() => {
+    const paper = document.getElementById('fire-paper');
+    if (paper) paper.classList.add('falling');
+
+    setTimeout(() => {
+      const tapHint = document.getElementById('fire-tap');
+      if (tapHint) tapHint.style.opacity = '1';
+      const ewEl = document.getElementById('ew');
+      if (ewEl) {
+        ewEl.style.cursor = 'pointer';
+        ewEl.onclick = () => { ewEl.onclick = null; startHugScreen(); };
+      }
+    }, 4200);
+  }, 300);
+}
+
+// ================================================================
+// HUG SCREEN
+// ================================================================
+function startHugScreen() {
+  go(screenHug, () => {
+    document.getElementById('hug-overlay').style.opacity = '1';
+    hugHeartInterval = setInterval(spawnHeart, 320);
+  });
+}
+
+function endHug() {
+  stopHearts();
+  document.getElementById('hug-overlay').style.opacity = '0';
+  go(screenMessage);
+}
+
+function stopHearts() {
+  stopFireMusic();
+  stopLetterMusic();
+  stopWaveMusic();
+  if (hugHeartInterval) {
+    clearInterval(hugHeartInterval);
+    hugHeartInterval = null;
+  }
+  document.querySelectorAll('.heart-el').forEach(el => el.remove());
+  const overlay = document.getElementById('hug-overlay');
+  if (overlay) overlay.style.opacity = '0';
+}
+
+function startBgMusic() {
+  if (bgAudio) return;
+  bgAudio = new Audio('music_for_video-calming-94427.mp3');
+  bgAudio.loop = true;
+  bgAudio.volume = 0.5;
+  bgAudio.play().catch(() => {});
+}
+function stopBgMusic() {
+  if (bgAudio) { bgAudio.pause(); bgAudio.currentTime = 0; bgAudio = null; }
+}
+function startFireMusic() {
+  stopBgMusic();
+  stopLetterMusic();
+  fireAudio = new Audio('restfuldreamingtunes-sounds-for-meditation-rainy-evening-by-the-fireplace-265450.mp3');
+  fireAudio.loop = true;
+  fireAudio.volume = 0.65;
+  fireAudio.play().catch(() => {});
+}
+function stopFireMusic() {
+  if (fireAudio) { fireAudio.pause(); fireAudio.currentTime = 0; fireAudio = null; }
+}
+function startLetterMusic() {
+  stopBgMusic();
+  stopFireMusic();
+  letterAudio = new Audio('clavier-music-calm-classical-piano-291012.mp3');
+  letterAudio.loop = true;
+  letterAudio.volume = 0.65;
+  letterAudio.play().catch(() => {});
+}
+function stopLetterMusic() {
+  if (letterAudio) { letterAudio.pause(); letterAudio.currentTime = 0; letterAudio = null; }
+}
+function startWaveMusic() {
+  stopBgMusic();
+  waveAudio = new Audio('wave-music.flac');
+  waveAudio.loop = true;
+  waveAudio.volume = 0.7;
+  waveAudio.play().catch(() => {});
+}
+function stopWaveMusic() {
+  if (waveAudio) { waveAudio.pause(); waveAudio.currentTime = 0; waveAudio = null; }
+}
+
+// ================================================================
+// 何もしない部屋
+// ================================================================
+function screenDoNothing() {
+  return `
+    <div class="nothing-room" onclick="leaveDoNothing()">
+      <div class="nr-sky-glow"></div>
+      <div class="nr-stars">
+        <span class="nr-star s1"></span>
+        <span class="nr-star s2"></span>
+        <span class="nr-star s3"></span>
+        <span class="nr-star s4"></span>
+        <span class="nr-star s5"></span>
+        <span class="nr-star s6"></span>
+      </div>
+      <div class="nr-moon-wrap">
+        <div class="nr-moon-glow"></div>
+        <div class="nr-moon"></div>
+      </div>
+      <div class="nr-message">
+        <div class="nr-bear-line">
+          何もしないの、<br>むずかしくない？<br>
+          波の音でも<br>聞いてってよ。
+        </div>
+      </div>
+      <div class="nr-ocean">
+        <div class="nr-moon-reflection"></div>
+        <div class="nr-foam-line"></div>
+        <div class="nr-wave one"></div>
+        <div class="nr-wave two"></div>
+        <div class="nr-wave three"></div>
+      </div>
+      <div class="nr-footer">戻りたくなったら、そっとタップしてね</div>
+    </div>
+  `;
+}
+function enterDoNothing() {
+  go(screenDoNothing, () => startWaveMusic());
+}
+function leaveDoNothing() {
+  go(screenWelcome);
+}
+
+function spawnHeart() {
+  // ♡ テキストは色でバリエーション、絵文字はそのまま
+  const variants = [
+    { ch:'♡', color:'#FF6B8A', opacity:1.0 },   // 濃いピンク・大
+    { ch:'♡', color:'#FFB6C1', opacity:0.85 },  // 薄いピンク
+    { ch:'♡', color:'#FF1464', opacity:1.0 },   // 濃い赤
+    { ch:'♡', color:'#FFCCD8', opacity:0.7 },   // 淡いピンク・小
+    { ch:'♡', color:'#E8A0B4', opacity:0.9 },   // くすみピンク
+    { ch:'♡', color:'#FF8FA8', opacity:0.95 },  // コーラル
+    { ch:'❤️', color:null,    opacity:1.0 },    // 赤ハート絵文字
+    { ch:'🩷', color:null,    opacity:1.0 },    // ピンクハート絵文字
+    { ch:'💕', color:null,    opacity:0.9 },    // ダブルハート
+    { ch:'💖', color:null,    opacity:0.9 },    // キラキラハート
+    { ch:'💗', color:null,    opacity:0.85 },   // 成長ハート
+    { ch:'🤍', color:null,    opacity:0.75 },   // 白ハート・淡い
+  ];
+  const v = variants[Math.floor(Math.random() * variants.length)];
+
+  // サイズ：小さい(0.6)〜大きい(3.2)をランダムに、小さめ多め
+  const sizeRand = Math.random();
+  const size = sizeRand < 0.5
+    ? 0.6 + Math.random() * 0.8          // 小さいハート群
+    : sizeRand < 0.8
+      ? 1.4 + Math.random() * 0.9        // 中くらい
+      : 2.4 + Math.random() * 0.8;       // 大きいハート（たまに）
+
+  const duration = 2.2 + Math.random() * 3.0;
+  const el = document.createElement('div');
+  el.className = 'heart-el';
+  el.textContent = v.ch;
+  el.style.cssText = `
+    font-size:${size}rem;
+    ${v.color ? `color:${v.color};` : ''}
+    opacity:${v.opacity};
+    left:${5 + Math.random() * 90}vw;
+    bottom:${Math.random() * 18}vh;
+    animation:heart-float ${duration}s ease-out forwards;
+  `;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), (duration + 0.5) * 1000);
+}
+
+// ================================================================
+// MEMORY (localStorage)
+// ================================================================
+const MEM_KEY = 'kimochi_mem_v2';
+function loadMems() {
+  try { return JSON.parse(localStorage.getItem(MEM_KEY) || '[]'); }
+  catch { return []; }
+}
+function saveMem() {
+  const mems = loadMems();
+  mems.push({
+    id: Date.now(),
+    text: S.text,
+    moodLabel: S.mood.label,
+    moodEmoji: S.mood.emoji,
+    date: new Date().toLocaleDateString('ja-JP', {year:'numeric',month:'long',day:'numeric'}),
+  });
+  localStorage.setItem(MEM_KEY, JSON.stringify(mems));
+}
+
+// ================================================================
+// TINY WIN STORAGE & MILESTONES
+// ================================================================
+const TINY_KEY = 'kimochi_tiny_v1';
+function loadTinyWins() {
+  try { return JSON.parse(localStorage.getItem(TINY_KEY) || '[]'); }
+  catch { return []; }
+}
+function saveTinyWin(text) {
+  const wins = loadTinyWins();
+  wins.push({
+    id: Date.now(),
+    text,
+    date: new Date().toLocaleDateString('ja-JP', {year:'numeric',month:'long',day:'numeric'}),
+  });
+  localStorage.setItem(TINY_KEY, JSON.stringify(wins));
+  return wins.length;
+}
+function checkMilestone(count) {
+  const M = {
+    1:   { title:'はじめての記録',  msg:'記録してくれてありがとう。' },
+    5:   { title:'5個達成！',       msg:'5つになったよ。\n積み重なってるねぇ。' },
+    10:  { title:'10個達成！',      msg:'10個になったよ。\nここに慣れてきた？' },
+    20:  { title:'20個達成！',      msg:'20個。\n一緒にここまで来たね。' },
+    30:  { title:'30個達成！',      msg:'30個になったよ。\n少しずつで良いのよ。\n「せんりのみちもいっぽから」\nって言うじゃない？' },
+    50:  { title:'50個達成！',      msg:'50個！\nもうこんなに？おどろいたのだ！！' },
+    100: { title:'100個達成！！',   msg:'100個！？\nここまで来てくれて嬉しい。' },
+  };
+  return M[count] || null;
+}
+
+// ================================================================
+// CALENDAR SCREEN
+// ================================================================
+function screenCalendar() {
+  const visits = new Set(loadVisitDays());
+  const today = getTodayStr();
+  const y = calMonth.getFullYear();
+  const m = calMonth.getMonth();
+  const label = `${y}年${m+1}月`;
+
+  const firstDow = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+
+  const now = new Date();
+  const isCurrentMonth = (y === now.getFullYear() && m === now.getMonth());
+  const nextDisabled = isCurrentMonth ? 'disabled' : '';
+
+  const dowCells = ['日','月','火','水','木','金','土']
+    .map(d => `<div class="cal-dow">${d}</div>`).join('');
+  const emptyCells = Array(firstDow).fill('<div class="cal-cell cal-empty"></div>').join('');
+
+  let dayCells = '';
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const todayCls  = dateStr === today ? ' cal-today' : '';
+    const visitedCls = visits.has(dateStr) ? ' cal-visited' : '';
+    const stamp = visits.has(dateStr) ? '<div class="cal-stamp">💗</div>' : '';
+    dayCells += `<div class="cal-cell${todayCls}${visitedCls}"><div class="cal-num">${d}</div>${stamp}</div>`;
+  }
+
+  return `
+    <div class="mem-header" style="margin-bottom:8px;">
+      <h2>📅 来た日カレンダー</h2>
+      <p style="font-size:0.78rem;color:#BBA098;margin-top:4px;">来た日に 💗 が付くよ</p>
+    </div>
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="changeCalMonth(-1)">‹</button>
+      <div class="cal-month-label">${label}</div>
+      <button class="cal-nav-btn" onclick="changeCalMonth(1)" ${nextDisabled}>›</button>
+    </div>
+    <div class="cal-grid">
+      ${dowCells}
+      ${emptyCells}
+      ${dayCells}
+    </div>
+    <button class="btn btn-ghost" style="margin-top:16px" onclick="go(screenWelcome)">もどる</button>
+  `;
+}
+
+function changeCalMonth(delta) {
+  calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + delta, 1);
+  go(screenCalendar);
+}
+
+// ================================================================
+// HELPERS
+// ================================================================
+function esc(s) {
+  if (!s) return '';
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+function nl2br(s) { return esc(s).replace(/\n/g,'<br>'); }
+
+// ================================================================
+// INIT
+// ================================================================
+recordVisit();
+document.getElementById('app').innerHTML = screenWelcome();
+</script>
+</body>
+</html>
