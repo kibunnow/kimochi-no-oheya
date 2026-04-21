@@ -1,0 +1,14 @@
+{
+  "name": "きもちのおへや",
+  "short_name": "きもちのおへや",
+  "description": "気持ちを記録してくれるやさしいアプリ",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#FFF8F2",
+  "theme_color": "#D4A5A5",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
