@@ -342,6 +342,26 @@ body::before {
 .mem-mood  { font-size:0.78rem; color:#7CB87A; margin-top:5px; }
 .mem-empty { text-align:center; padding:28px 0; color:#BBA098; font-size:0.9rem; line-height:1.9; }
 
+/* ── Photo picker ── */
+.photo-row { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 4px; }
+.photo-slot {
+  width:72px; height:72px; border-radius:10px;
+  border:2px dashed #D4C0B8; background:#FFF8F4;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; overflow:hidden; position:relative; flex-shrink:0;
+}
+.photo-slot img { width:100%; height:100%; object-fit:cover; display:block; }
+.photo-slot .slot-add { font-size:1.6rem; color:#D4C0B8; pointer-events:none; }
+.photo-slot .slot-del {
+  position:absolute; top:3px; right:3px;
+  background:rgba(0,0,0,0.45); color:white;
+  border:none; border-radius:50%; width:20px; height:20px;
+  font-size:0.65rem; cursor:pointer; line-height:20px; text-align:center; padding:0;
+}
+/* ── Photos in memory card ── */
+.mem-photos { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+.mem-photo { width:64px; height:64px; border-radius:8px; object-fit:cover; cursor:pointer; }
+
 /* ── Growth counter ── */
 .growth-bar {
   display:flex; align-items:center; gap:8px; justify-content:center;
@@ -689,7 +709,7 @@ const MOODS = [
 // ================================================================
 // STATE
 // ================================================================
-let S = { mood:null, text:'', tinyText:'' };
+let S = { mood:null, text:'', tinyText:'', photos:[] };
 let hugHeartInterval = null;
 let calMonth = new Date();
 let fireAudio = null;
@@ -842,9 +862,16 @@ function screenMood() {
 }
 
 function screenInput() {
-  const prompt = S.mood.type === 'pos'
+  const isPos = S.mood.type === 'pos';
+  const prompt = isPos
     ? 'お？なになに？？<br>もっと聞かせてよ！<br><span style="font-size:0.82rem;color:#BBA098">（書かなくても大丈夫だよ）</span>'
     : 'そっか…。<br>よかったら聞かせてほしいかも。<br><span style="font-size:0.82rem;color:#BBA098">（書かなくても大丈夫だよ）</span>';
+  const photoArea = isPos ? `
+    <div style="width:100%;max-width:360px;margin-top:6px;">
+      <div style="font-size:0.78rem;color:#BBA098;margin-bottom:5px;">📷 写真も追加できるよ（最大4枚）</div>
+      <div class="photo-row" id="photo-row">${renderPhotoSlots()}</div>
+      <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="addPhoto(this)">
+    </div>` : '';
   return `
     <div class="char-wrap" style="margin-bottom:8px">
       <div class="char-svg sm">${bearSVG()}</div>
@@ -852,6 +879,7 @@ function screenInput() {
     <div class="bubble">${prompt}</div>
     <textarea class="input-box" id="txt" placeholder="今日のことを書いてみてね..."
       oninput="S.text=this.value">${esc(S.text)}</textarea>
+    ${photoArea}
     <p class="skip-note">※書かなくても「おくる」を押せるよ</p>
     <button class="btn" onclick="submitText()">おくる ✉️</button>
     <button class="btn btn-ghost btn-sm" style="margin-top:4px" onclick="go(screenMood)">← 気分を選びなおす</button>
@@ -897,11 +925,19 @@ function screenMemory() {
   const wins = loadTinyWins();
   const memItems = mems.length === 0
     ? `<div class="mem-empty">まだ記録がないよ。<br>嬉しいこと・楽しいことを<br>書いてみてね 🌸</div>`
-    : [...mems].reverse().map(m => `
+    : [...mems].reverse().map(m => {
+        const photoHtml = (m.photos && m.photos.length)
+          ? `<div class="mem-photos">${m.photos.map(p =>
+              `<img class="mem-photo" src="${p}" alt="写真" onclick="viewPhoto('${p}')">`
+            ).join('')}</div>`
+          : '';
+        return `
         <div class="mem-card">
           <div class="mem-date">${m.date} · ${m.moodEmoji} ${m.moodLabel}</div>
           <div class="mem-text">${esc(m.text)}</div>
-        </div>`).join('');
+          ${photoHtml}
+        </div>`;
+      }).join('');
   const winItems = wins.length === 0
     ? `<div class="mem-empty">まだ記録がないよ。<br>どんな小さなことでも<br>書いてみてね 🌱</div>`
     : [...wins].reverse().map(w => `
@@ -991,12 +1027,78 @@ function screenTinyWinResult(text, count, milestone) {
 // ================================================================
 // FLOW LOGIC
 // ================================================================
-function startFlow() { markStartedToday(); recordVisit(); S.text=''; S.mood=null; go(screenMood); }
+function startFlow() { markStartedToday(); recordVisit(); S.text=''; S.mood=null; S.photos=[]; go(screenMood); }
 
 function pickMood(id) {
   S.mood = MOODS.find(m => m.id === id);
-  S.text = '';
+  S.text = ''; S.photos = [];
   go(screenInput);
+}
+
+// ================================================================
+// PHOTO HELPER
+// ================================================================
+function compressImage(file, cb) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 700;
+      let w = img.width, h = img.height;
+      if (w > h) { if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; } }
+      else        { if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; } }
+      const cv = document.createElement('canvas');
+      cv.width = w; cv.height = h;
+      cv.getContext('2d').drawImage(img, 0, 0, w, h);
+      cb(cv.toDataURL('image/jpeg', 0.6));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function renderPhotoSlots() {
+  let html = '';
+  for (let i = 0; i < 4; i++) {
+    if (S.photos[i]) {
+      html += `<div class="photo-slot">
+        <img src="${S.photos[i]}" alt="写真${i+1}">
+        <button class="slot-del" onclick="removePhoto(${i})">✕</button>
+      </div>`;
+    } else if (i === S.photos.length) {
+      html += `<div class="photo-slot" onclick="document.getElementById('photo-input').click()">
+        <span class="slot-add">＋</span>
+      </div>`;
+    } else {
+      html += `<div class="photo-slot" style="opacity:0.3;cursor:default;"></div>`;
+    }
+  }
+  return html;
+}
+function addPhoto(input) {
+  const file = input.files[0];
+  if (!file || S.photos.length >= 4) return;
+  input.value = '';
+  compressImage(file, b64 => {
+    S.photos.push(b64);
+    const row = document.getElementById('photo-row');
+    if (row) row.innerHTML = renderPhotoSlots();
+  });
+}
+function removePhoto(idx) {
+  S.photos.splice(idx, 1);
+  const row = document.getElementById('photo-row');
+  if (row) row.innerHTML = renderPhotoSlots();
+}
+// 写真を拡大表示
+function viewPhoto(src) {
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;';
+  ov.onclick = () => document.body.removeChild(ov);
+  const img = document.createElement('img');
+  img.src = src;
+  img.style.cssText = 'max-width:92vw;max-height:88vh;border-radius:12px;';
+  ov.appendChild(img);
+  document.body.appendChild(ov);
 }
 
 function submitText() {
@@ -1012,7 +1114,7 @@ function submitText() {
 }
 
 function resetFlow() {
-  S.mood = null; S.text = '';
+  S.mood = null; S.text = ''; S.photos = [];
   go(screenWelcome);
 }
 
@@ -1300,8 +1402,15 @@ function saveMem() {
     moodLabel: S.mood.label,
     moodEmoji: S.mood.emoji,
     date: new Date().toLocaleDateString('ja-JP', {year:'numeric',month:'long',day:'numeric'}),
+    photos: S.photos.slice(),
   });
-  localStorage.setItem(MEM_KEY, JSON.stringify(mems));
+  try {
+    localStorage.setItem(MEM_KEY, JSON.stringify(mems));
+  } catch(e) {
+    // 容量不足の場合は写真なしで保存
+    mems[mems.length-1].photos = [];
+    try { localStorage.setItem(MEM_KEY, JSON.stringify(mems)); } catch(e2) {}
+  }
 }
 
 // ================================================================
