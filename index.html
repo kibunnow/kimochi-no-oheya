@@ -688,7 +688,12 @@ body::before {
 // ================================================================
 const CHAR = {
   bc:'#D4A5A5', ac:'#B08080', sc:'#FFB6C1',
-  greet:'来てくれたんだ。\nよかったらゆっくりしてってよ。\n今の気持ちはどうかな？',
+  greetVariants:[
+    '来てくれたんだ。\n今日もゆっくりしてってよ。',
+    '今日もおつかれさま。\nここではゆっくできるよ。',
+    '今日はどんな感じ？\n言葉にならなくてもいいよ。',
+    'ふふ、また会えたねぇ。\n今日もゆっくりしてってね。',
+  ],
   posVariants:[
     '本当に良かった！\nあれ、今日輝いてない？\nいい気分だねぇ。ふふ',
   ],
@@ -845,7 +850,7 @@ function screenWelcome() {
       </div>
     </div>
     ${growthBarHTML()}
-    <div class="bubble">${nl2br(CHAR.greet)}</div>
+    <div class="bubble">${nl2br(CHAR.greetVariants[Math.floor(Math.random()*CHAR.greetVariants.length)])}</div>
     ${startBtn}
     <button class="btn btn-green btn-ghost" style="margin-top:6px;background:white;color:#55A855;border-color:#B5E8B5;" onclick="go(screenTinyWin)">ちいさな頑張りを記録する 🌱</button>
     <a href="privacy.html" style="display:block;margin-top:18px;font-size:0.72rem;color:#BBA098;text-decoration:none;opacity:0.8;">プライバシーについて</a>
@@ -897,10 +902,18 @@ function screenEffect() {
 }
 
 function screenHug() {
+  const hugMsgs = [
+    '眠たいのに寝れない？\n寝れるまで一緒にいよっか。',
+    'ほんとうにおつかれさま。\n今日はもう、休もっか。',
+    '今日はここに来てくれて、\nありがとう。',
+    'うまくいかない日も\nあるよね。\nそんな日こそ\n自分を大切にしよ。',
+    '今日は、\nもうお休みする？',
+  ];
+  const msg = hugMsgs[Math.floor(Math.random()*hugMsgs.length)];
   return `
     <div class="hug-screen" onclick="endHug()">
       <p class="effect-note" style="margin-bottom:20px;">
-        本当におつかれさま。<br>今日はゆっくりしてね。<br>このまま少し<br>いっしょに休む？
+        ${nl2br(msg)}
       </p>
       <div class="hug-bear" style="width:190px;height:190px;">
         ${bearSVG()}
@@ -1327,10 +1340,7 @@ function screenDoNothing() {
         <div class="nr-moon"></div>
       </div>
       <div class="nr-message">
-        <div class="nr-bear-line">
-          たまには<br>ゆっくりしてさ、<br>
-          波の音でも<br>聞いてってよ。
-        </div>
+        <div class="nr-bear-line" id="nr-msg"></div>
       </div>
       <div class="nr-ocean">
         <div class="nr-moon-reflection"></div>
@@ -1344,7 +1354,17 @@ function screenDoNothing() {
   `;
 }
 function enterDoNothing() {
-  go(screenDoNothing, () => startWaveMusic());
+  go(screenDoNothing, () => {
+    startWaveMusic();
+    const msgs = [
+      '何もしない時間って、\nけっこう大事なのよ。',
+      '波だけ見てよっか。\n答えはあとでいいよ。',
+      'ここでは、\nぼーっとしてるのも\nいい時間。',
+      '今日は\n省エネでいこ。',
+    ];
+    const el = document.getElementById('nr-msg');
+    if (el) el.innerHTML = nl2br(msgs[Math.floor(Math.random()*msgs.length)]);
+  });
 }
 function leaveDoNothing() {
   go(screenWelcome);
