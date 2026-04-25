@@ -412,7 +412,6 @@ body::before {
 }
 
 /* 雲チップ（ちいさな頑張り） */
-.cloud-chips { position:relative; width:100%; min-height:80px; margin-bottom:8px; }
 .cloud-chip {
   position:absolute;
   background:rgba(255,255,255,0.28);
@@ -1122,19 +1121,21 @@ function screenMemory() {
         </div>`;
       }).join('');
 
-  const cloudChips = wins.length === 0 ? '' :
-    `<div class="cloud-chips" style="height:${Math.min(wins.length*28+40,140)}px;">
-      ${[...wins].reverse().slice(0,12).map((w,i) => {
-        const left = (i * 23 + 5) % 72;
-        const top  = (i * 31 + 8) % 75;
-        const dur  = 3.5 + (i * 0.6) % 3;
-        const delay = -(i * 0.45);
-        return `<div class="cloud-chip" style="left:${left}%;top:${top}%;animation-duration:${dur}s;animation-delay:${delay}s;">${esc(w.text)}</div>`;
-      }).join('')}
-    </div>`;
+  const cloudDecos = wins.length === 0 ? '' :
+    [...wins].reverse().slice(0, 16).map((w, i) => {
+      const left  = (i * 23 + 5) % 88;
+      const top   = (i * 31 + 8) % 88;
+      const dur   = 3.5 + (i * 0.6) % 3;
+      const delay = -(i * 0.45);
+      return `<div class="cloud-chip" style="left:${left}%;top:${top}%;animation-duration:${dur}s;animation-delay:${delay}s;">${esc(w.text)}</div>`;
+    }).join('');
+
+  const winsCountLabel = wins.length > 0
+    ? `<div style="font-size:0.78rem;color:${isNight?'rgba(200,220,255,0.6)':'rgba(100,80,70,0.5)'};margin-bottom:6px;">☁️ ちいさな頑張り ${wins.length}個</div>`
+    : '';
 
   return `
-    <div class="sky-deco-layer ${skyClass}">${skyDecoHTML()}</div>
+    <div class="sky-deco-layer ${skyClass}">${skyDecoHTML()}${cloudDecos}</div>
     <div class="sky-mem-wrap ${skyClass}">
       <div style="text-align:center;margin-bottom:20px;">
         <div style="font-size:1.3rem;font-weight:bold;color:${titleColor};">おもいでの空 ☁️</div>
@@ -1145,9 +1146,8 @@ function screenMemory() {
         ${memCards}
       </div>
 
-      ${cloudChips}
-
-      <button class="btn btn-ghost" style="margin-top:16px;background:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.5);" onclick="go(screenWelcome)">もどる</button>
+      ${winsCountLabel}
+      <button class="btn btn-ghost" style="background:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.5);" onclick="go(screenWelcome)">もどる</button>
     </div>
   `;
 }
