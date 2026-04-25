@@ -378,9 +378,120 @@ body::before {
   border:none; border-radius:50%; width:20px; height:20px;
   font-size:0.65rem; cursor:pointer; line-height:20px; text-align:center; padding:0;
 }
-/* ── Photos in memory card ── */
+/* ── Photos in memory card (legacy) ── */
 .mem-photos { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
 .mem-photo { width:64px; height:64px; border-radius:8px; object-fit:cover; cursor:pointer; }
+
+/* ════════════════════════════════════════
+   おもいでの空 スクリーン
+════════════════════════════════════════ */
+.sky-bg-day   { background:linear-gradient(to bottom,#56B4E9,#87CEEB,#C8EEFF); }
+.sky-bg-eve   { background:linear-gradient(to bottom,#E8622A,#F4904A,#F8B85A,#FDE8A0); }
+.sky-bg-night { background:linear-gradient(to bottom,#0C1A38,#172E60,#2A4A8A); }
+
+.sky-mem-wrap {
+  position:fixed; inset:0; z-index:10; overflow-y:auto;
+  display:flex; flex-direction:column; align-items:center;
+  padding:24px 16px 80px;
+}
+.sky-deco-layer {
+  position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:9;
+}
+.sky-deco-item {
+  position:absolute;
+  animation:skyFloat ease-in-out infinite;
+  font-size:1.1rem; opacity:0.5;
+}
+@keyframes skyFloat {
+  0%,100% { transform:translateY(0) translateX(0); opacity:0.5; }
+  50%     { transform:translateY(-16px) translateX(8px); opacity:0.8; }
+}
+@keyframes cloudDrift {
+  0%,100% { transform:translateX(0); }
+  50%     { transform:translateX(10px); }
+}
+
+/* 雲チップ（ちいさな頑張り） */
+.cloud-chips { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; padding:6px 0 12px; width:100%; max-width:360px; }
+.cloud-chip {
+  background:rgba(255,255,255,0.88);
+  border-radius:40px; padding:8px 18px;
+  font-size:0.83rem; color:#5C4033;
+  box-shadow:0 4px 12px rgba(0,0,0,0.10);
+  animation:cloudDrift ease-in-out infinite;
+  text-align:center; line-height:1.4;
+}
+.cloud-chip-date { font-size:0.65rem; color:#BBA098; display:block; margin-top:2px; }
+
+/* 空カード（思い出） */
+.sky-card {
+  width:100%; max-width:360px;
+  background:rgba(255,255,255,0.84);
+  border-radius:18px; padding:14px 16px;
+  margin-bottom:12px;
+  box-shadow:0 4px 18px rgba(0,0,0,0.10);
+}
+.sky-card-date { font-size:0.7rem; color:#9E7B6E; margin-bottom:4px; }
+.sky-card-text { font-size:0.87rem; color:#5C4033; line-height:1.55; min-height:0; }
+
+/* 写真グリッド */
+.photo-grid-solo { margin-top:8px; }
+.photo-grid-solo img {
+  width:100%; max-height:240px; object-fit:cover;
+  border-radius:12px; cursor:pointer; display:block;
+}
+.photo-grid-multi {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:5px; margin-top:8px;
+}
+.photo-grid-multi img {
+  width:100%; aspect-ratio:1; object-fit:cover;
+  border-radius:10px; cursor:pointer; display:block;
+}
+
+/* 写真フルスクリーンビューア */
+.photo-viewer {
+  position:fixed; inset:0; z-index:999;
+  background:rgba(0,0,0,0.88);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  touch-action:pan-y;
+}
+.photo-viewer-img {
+  max-width:92vw; max-height:68vh;
+  border-radius:12px; object-fit:contain;
+  transition:opacity 0.2s;
+}
+.photo-viewer-comment {
+  margin-top:14px;
+  background:rgba(255,255,255,0.12);
+  border-radius:16px; padding:10px 20px;
+  color:white; font-size:0.88rem;
+  max-width:80vw; text-align:center; line-height:1.6;
+}
+.photo-viewer-nav {
+  display:flex; gap:24px; margin-top:12px;
+}
+.photo-viewer-nav button {
+  background:rgba(255,255,255,0.18); border:none;
+  color:white; font-size:1.4rem; border-radius:50%;
+  width:44px; height:44px; cursor:pointer;
+}
+.photo-viewer-close {
+  position:absolute; top:16px; right:16px;
+  background:rgba(255,255,255,0.2); border:none;
+  color:white; font-size:1.2rem; border-radius:50%;
+  width:36px; height:36px; cursor:pointer;
+}
+.photo-viewer-dots {
+  display:flex; gap:6px; margin-top:10px;
+}
+.photo-viewer-dots span {
+  width:7px; height:7px; border-radius:50%;
+  background:rgba(255,255,255,0.4);
+  transition:background 0.2s;
+}
+.photo-viewer-dots span.active { background:white; }
 
 /* ── Growth counter ── */
 .growth-bar {
@@ -950,48 +1061,93 @@ function screenMessage() {
     </div>
     <div class="bubble">${nl2br(msg)}</div>
     <button class="btn" onclick="resetFlow()">もどる 🏠</button>
-    <button class="btn btn-ghost" style="margin-top:4px" onclick="go(screenMemory)">ノートを見る 📖</button>
+    <button class="btn btn-ghost" style="margin-top:4px" onclick="go(screenMemory)">おもいでの空 ☁️</button>
   `;
 }
 
+function getSkyClass() {
+  const h = new Date().getHours();
+  if (h >= 17 && h < 20) return 'sky-bg-eve';
+  if (h >= 20 || h < 5)  return 'sky-bg-night';
+  return 'sky-bg-day';
+}
+function skyDecoHTML() {
+  const isNight = getSkyClass() === 'sky-bg-night';
+  const items = isNight
+    ? ['⭐','🌟','💫','✨','⭐','🌙','💫','✨','⭐','🌟']
+    : ['☁️','☁️','🌸','☁️','💕','☁️','🌟','☁️','🌸','💕'];
+  return items.map((item, i) => {
+    const left = (i * 11 + 3) % 90;
+    const top  = (i * 17 + 5) % 80;
+    const dur  = 3.5 + (i * 0.7) % 3;
+    const delay = -(i * 0.5);
+    return `<span class="sky-deco-item" style="left:${left}%;top:${top}%;animation-duration:${dur}s;animation-delay:${delay}s;">${item}</span>`;
+  }).join('');
+}
+function renderMemPhotoGrid(photos, allPhotos) {
+  if (!photos || !photos.length) return '';
+  const srcs = allPhotos || photos;
+  if (photos.length === 1) {
+    return `<div class="photo-grid-solo">
+      <img src="${photos[0]}" alt="写真" onclick="viewPhoto('${photos[0]}',${JSON.stringify(srcs)},0)">
+    </div>`;
+  }
+  const imgs = photos.map((p, i) =>
+    `<img src="${p}" alt="写真" onclick="viewPhoto('${p}',${JSON.stringify(srcs)},${i})">`
+  ).join('');
+  return `<div class="photo-grid-multi">${imgs}</div>`;
+}
 function screenMemory() {
   const mems = loadMems();
   const wins = loadTinyWins();
-  const memItems = mems.length === 0
-    ? `<div class="mem-empty">まだ記録がないよ。<br>嬉しいこと・楽しいことを<br>書いてみてね 🌸</div>`
+  const skyClass = getSkyClass();
+  const isNight = skyClass === 'sky-bg-night';
+  const titleColor  = isNight ? 'rgba(255,255,255,0.9)' : '#5C4033';
+  const sectionColor = isNight ? 'rgba(255,255,255,0.75)' : '#7A5C50';
+
+  const memCards = mems.length === 0
+    ? `<div style="text-align:center;padding:28px 0;color:${isNight?'rgba(255,255,255,0.6)':'#BBA098'};font-size:0.9rem;line-height:1.9;">
+        まだ記録がないよ。<br>嬉しいこと・楽しいことを<br>書いてみてね 🌸</div>`
     : [...mems].reverse().map(m => {
-        const photoHtml = (m.photos && m.photos.length)
-          ? `<div class="mem-photos">${m.photos.map(p =>
-              `<img class="mem-photo" src="${p}" alt="写真" onclick="viewPhoto('${p}')">`
-            ).join('')}</div>`
-          : '';
+        const photos = m.photos && m.photos.length ? m.photos : [];
         return `
-        <div class="mem-card">
-          <div class="mem-date">${m.date} · ${m.moodEmoji} ${m.moodLabel}</div>
-          <div class="mem-text">${esc(m.text)}</div>
-          ${photoHtml}
+        <div class="sky-card">
+          <div class="sky-card-date">${m.date} · ${m.moodEmoji} ${m.moodLabel}</div>
+          <div class="sky-card-text">${esc(m.text)}</div>
+          ${renderMemPhotoGrid(photos, photos)}
         </div>`;
       }).join('');
-  const winItems = wins.length === 0
-    ? `<div class="mem-empty">まだ記録がないよ。<br>どんな小さなことでも<br>書いてみてね 🌱</div>`
-    : [...wins].reverse().map(w => `
-        <div class="tiny-card">
-          <div class="tiny-date">${w.date}</div>
-          <div class="tiny-text">🌱 ${esc(w.text)}</div>
-        </div>`).join('');
+
+  const cloudChips = wins.length === 0
+    ? `<div style="text-align:center;padding:16px 0;color:${isNight?'rgba(255,255,255,0.6)':'#BBA098'};font-size:0.88rem;">
+        まだ記録がないよ 🌱</div>`
+    : `<div class="cloud-chips">${[...wins].reverse().map((w,i) =>
+        `<div class="cloud-chip" style="animation-duration:${3+i%3}s;animation-delay:${-(i*0.4)}s;">
+          ${esc(w.text)}
+          <span class="cloud-chip-date">${w.date}</span>
+        </div>`
+      ).join('')}</div>`;
+
   return `
-    <div class="mem-header">
-      <h2>📖 ノートを見る</h2>
+    <div class="sky-deco-layer ${skyClass}">${skyDecoHTML()}</div>
+    <div class="sky-mem-wrap ${skyClass}">
+      <div style="text-align:center;margin-bottom:20px;">
+        <div style="font-size:1.3rem;font-weight:bold;color:${titleColor};">おもいでの空 ☁️</div>
+        <div style="font-size:0.8rem;color:${sectionColor};margin-top:4px;">大切な気持ちが空に浮かんでいるよ</div>
+      </div>
+
+      <div style="width:100%;max-width:360px;margin-bottom:6px;">
+        <div style="font-size:0.85rem;font-weight:bold;color:${sectionColor};margin-bottom:8px;">✨ 思い出</div>
+        ${memCards}
+      </div>
+
+      <div style="width:100%;max-width:360px;margin-top:8px;">
+        <div style="font-size:0.85rem;font-weight:bold;color:${sectionColor};margin-bottom:4px;">☁️ ちいさな頑張り（${wins.length}個）</div>
+        ${cloudChips}
+      </div>
+
+      <button class="btn btn-ghost" style="margin-top:16px;background:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.5);" onclick="go(screenWelcome)">もどる</button>
     </div>
-    <div style="width:100%;max-width:360px;margin-bottom:8px;">
-      <div style="font-size:0.92rem;font-weight:bold;color:#9ADE9A;margin-bottom:6px;">✨ 思い出ノート</div>
-      <div class="mem-list" style="max-height:30vh;">${memItems}</div>
-    </div>
-    <div style="width:100%;max-width:360px;margin-bottom:8px;">
-      <div style="font-size:0.92rem;font-weight:bold;color:#7DD87D;margin-bottom:6px;">🌱 頑張りノート（${wins.length}個）</div>
-      <div class="mem-list" style="max-height:30vh;">${winItems}</div>
-    </div>
-    <button class="btn btn-ghost" style="margin-top:8px" onclick="go(screenWelcome)">もどる</button>
   `;
 }
 
@@ -1054,7 +1210,7 @@ function screenTinyWinResult(text, count, milestone) {
     </div>
     ${milestoneHTML}
     <button class="btn" onclick="resetFlow()">もどる 🏠</button>
-    <button class="btn btn-ghost btn-sm" style="margin-top:4px" onclick="go(screenMemory)">ノートを見る 📖</button>
+    <button class="btn btn-ghost btn-sm" style="margin-top:4px" onclick="go(screenMemory)">おもいでの空 ☁️</button>
   `;
 }
 
@@ -1156,14 +1312,51 @@ function removePhoto(idx) {
   if (row) row.innerHTML = renderPhotoSlots();
 }
 // 写真を拡大表示
-function viewPhoto(src) {
+const PHOTO_COMMENTS = [
+  'この日は嬉しかったね～🌸',
+  'いい表情してる！きらきらしてるよ。',
+  'こんな素敵な日があったんだね。',
+  'この瞬間、ちゃんと覚えてるよ。',
+  '大切な思い出だね🍀',
+  'この日のこと、忘れないでね。',
+  'あの頃の自分に、よくがんばったねって言いたい。',
+];
+function viewPhoto(src, photos, startIdx) {
+  photos = photos || [src];
+  let idx = startIdx !== undefined ? startIdx : photos.indexOf(src);
+  if (idx < 0) idx = 0;
+
   const ov = document.createElement('div');
-  ov.style.cssText = 'position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;';
-  ov.onclick = () => document.body.removeChild(ov);
-  const img = document.createElement('img');
-  img.src = src;
-  img.style.cssText = 'max-width:92vw;max-height:88vh;border-radius:12px;';
-  ov.appendChild(img);
+  ov.className = 'photo-viewer';
+
+  function render() {
+    const comment = PHOTO_COMMENTS[Math.floor(Math.random() * PHOTO_COMMENTS.length)];
+    const hasPrev = idx > 0, hasNext = idx < photos.length - 1;
+    const dots = photos.length > 1
+      ? `<div class="photo-viewer-dots">${photos.map((_,i) =>
+          `<span class="${i===idx?'active':''}"></span>`).join('')}</div>` : '';
+    ov.innerHTML = `
+      <button class="photo-viewer-close" onclick="this.closest('.photo-viewer').remove()">✕</button>
+      <img class="photo-viewer-img" src="${photos[idx]}" alt="写真">
+      <div class="photo-viewer-comment">🐻 ${comment}</div>
+      ${dots}
+      <div class="photo-viewer-nav">
+        <button onclick="pvNav(-1)" style="opacity:${hasPrev?1:0.2}">‹</button>
+        <button onclick="pvNav(1)"  style="opacity:${hasNext?1:0.2}">›</button>
+      </div>`;
+  }
+  window.pvNav = (dir) => {
+    const next = idx + dir;
+    if (next >= 0 && next < photos.length) { idx = next; render(); }
+  };
+  // スワイプ対応
+  let tx = 0;
+  ov.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive:true });
+  ov.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 40) window.pvNav(dx < 0 ? 1 : -1);
+  });
+  render();
   document.body.appendChild(ov);
 }
 
@@ -1181,6 +1374,44 @@ function submitText() {
 
 function resetFlow() {
   S.mood = null; S.text = ''; S.photos = [];
+  showAdThenHome();
+}
+
+// ================================================================
+// AdMob インタースティシャル広告
+// ================================================================
+const ADMOB_INTERSTITIAL_ID = 'ca-app-pub-3366250948664729/3301419559';
+
+function getAdMob() {
+  return window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AdMob
+    ? window.Capacitor.Plugins.AdMob : null;
+}
+
+// アプリ起動時に AdMob を初期化
+document.addEventListener('DOMContentLoaded', async () => {
+  const AdMob = getAdMob();
+  if (AdMob) {
+    try {
+      await AdMob.initialize({ requestTrackingAuthorization: false });
+    } catch(e) {}
+  }
+});
+
+async function showAdThenHome() {
+  const AdMob = getAdMob();
+  if (AdMob) {
+    try {
+      await AdMob.prepareInterstitial({ adId: ADMOB_INTERSTITIAL_ID });
+      await AdMob.showInterstitial();
+      // 広告が閉じられるのを待つ
+      await new Promise(resolve => {
+        document.addEventListener('ionicAdMobInterstitialDismiss', resolve, { once: true });
+        setTimeout(resolve, 8000); // 最大8秒待ってホームへ
+      });
+    } catch(e) {
+      // 広告失敗時はそのままホームへ
+    }
+  }
   go(screenWelcome);
 }
 
