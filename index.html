@@ -951,10 +951,8 @@ function growthBarHTML() {
 
 function screenWelcome() {
   const visitCount = loadVisitDays().length;
-  const alreadyStarted = hasStartedToday();
-  const startBtn = alreadyStarted
-    ? `<button class="btn" disabled style="opacity:0.45;cursor:default;">今日はもう記録したよ 🌙</button>`
-    : `<button class="btn" onclick="startFlow()">はじめる ✨</button>`;
+  // const alreadyStarted = hasStartedToday(); // TODO: 完成後に制限を戻す
+  const startBtn = `<button class="btn" onclick="startFlow()">はじめる ✨</button>`;
   return `
     <div style="text-align:center">
       <div class="app-title">きもちのおへや</div>
