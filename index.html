@@ -1134,9 +1134,14 @@ function screenMemory() {
     ? `<div style="font-size:0.78rem;color:${isNight?'rgba(200,220,255,0.6)':'rgba(100,80,70,0.5)'};margin-bottom:6px;">☁️ ちいさな頑張り ${wins.length}個</div>`
     : '';
 
+  const cloudLayer = cloudDecos
+    ? `<div style="position:fixed;inset:0;pointer-events:none;overflow:hidden;">${cloudDecos}</div>`
+    : '';
+
   return `
-    <div class="sky-deco-layer ${skyClass}">${skyDecoHTML()}${cloudDecos}</div>
+    <div class="sky-deco-layer ${skyClass}">${skyDecoHTML()}</div>
     <div class="sky-mem-wrap ${skyClass}">
+      ${cloudLayer}
       <div style="text-align:center;margin-bottom:20px;">
         <div style="font-size:1.3rem;font-weight:bold;color:${titleColor};">おもいでの空 ☁️</div>
       </div>
