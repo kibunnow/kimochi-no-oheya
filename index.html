@@ -412,16 +412,22 @@ body::before {
 }
 
 /* 雲チップ（ちいさな頑張り） */
-.cloud-chips { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; padding:6px 0 12px; width:100%; max-width:360px; }
+.cloud-chips { position:relative; width:100%; min-height:80px; margin-bottom:8px; }
 .cloud-chip {
-  background:rgba(255,255,255,0.88);
-  border-radius:40px; padding:8px 18px;
-  font-size:0.83rem; color:#5C4033;
-  box-shadow:0 4px 12px rgba(0,0,0,0.10);
+  position:absolute;
+  background:rgba(255,255,255,0.28);
+  border-radius:40px; padding:6px 16px;
+  font-size:0.78rem; color:rgba(255,255,255,0.65);
+  box-shadow:none;
   animation:cloudDrift ease-in-out infinite;
   text-align:center; line-height:1.4;
+  pointer-events:none;
+  white-space:nowrap;
 }
-.cloud-chip-date { font-size:0.65rem; color:#BBA098; display:block; margin-top:2px; }
+.sky-bg-day .cloud-chip { color:rgba(80,60,50,0.35); background:rgba(255,255,255,0.35); }
+.sky-bg-eve .cloud-chip { color:rgba(255,240,220,0.5); background:rgba(255,255,255,0.22); }
+.sky-bg-night .cloud-chip { color:rgba(200,220,255,0.4); background:rgba(255,255,255,0.10); }
+.cloud-chip-date { display:none; }
 
 /* 空カード（思い出） */
 .sky-card {
@@ -1116,22 +1122,22 @@ function screenMemory() {
         </div>`;
       }).join('');
 
-  const cloudChips = wins.length === 0
-    ? `<div style="text-align:center;padding:16px 0;color:${isNight?'rgba(255,255,255,0.6)':'#BBA098'};font-size:0.88rem;">
-        まだ記録がないよ 🌱</div>`
-    : `<div class="cloud-chips">${[...wins].reverse().map((w,i) =>
-        `<div class="cloud-chip" style="animation-duration:${3+i%3}s;animation-delay:${-(i*0.4)}s;">
-          ${esc(w.text)}
-          <span class="cloud-chip-date">${w.date}</span>
-        </div>`
-      ).join('')}</div>`;
+  const cloudChips = wins.length === 0 ? '' :
+    `<div class="cloud-chips" style="height:${Math.min(wins.length*28+40,140)}px;">
+      ${[...wins].reverse().slice(0,12).map((w,i) => {
+        const left = (i * 23 + 5) % 72;
+        const top  = (i * 31 + 8) % 75;
+        const dur  = 3.5 + (i * 0.6) % 3;
+        const delay = -(i * 0.45);
+        return `<div class="cloud-chip" style="left:${left}%;top:${top}%;animation-duration:${dur}s;animation-delay:${delay}s;">${esc(w.text)}</div>`;
+      }).join('')}
+    </div>`;
 
   return `
     <div class="sky-deco-layer ${skyClass}">${skyDecoHTML()}</div>
     <div class="sky-mem-wrap ${skyClass}">
       <div style="text-align:center;margin-bottom:20px;">
         <div style="font-size:1.3rem;font-weight:bold;color:${titleColor};">おもいでの空 ☁️</div>
-        <div style="font-size:0.8rem;color:${sectionColor};margin-top:4px;">大切な気持ちが空に浮かんでいるよ</div>
       </div>
 
       <div style="width:100%;max-width:360px;margin-bottom:6px;">
@@ -1139,10 +1145,7 @@ function screenMemory() {
         ${memCards}
       </div>
 
-      <div style="width:100%;max-width:360px;margin-top:8px;">
-        <div style="font-size:0.85rem;font-weight:bold;color:${sectionColor};margin-bottom:4px;">☁️ ちいさな頑張り（${wins.length}個）</div>
-        ${cloudChips}
-      </div>
+      ${cloudChips}
 
       <button class="btn btn-ghost" style="margin-top:16px;background:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.5);" onclick="go(screenWelcome)">もどる</button>
     </div>
