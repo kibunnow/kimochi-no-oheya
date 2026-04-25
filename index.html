@@ -1127,7 +1127,9 @@ function screenMemory() {
       const top   = (i * 31 + 8) % 88;
       const dur   = 3.5 + (i * 0.6) % 3;
       const delay = -(i * 0.45);
-      return `<div class="cloud-chip" style="left:${left}%;top:${top}%;animation-duration:${dur}s;animation-delay:${delay}s;">${esc(w.text)}</div>`;
+      const safeText = esc(w.text).replace(/'/g,"&#39;");
+      const safeDate = w.date.replace(/'/g,"&#39;");
+      return `<div class="cloud-chip" style="left:${left}%;top:${top}%;animation-duration:${dur}s;animation-delay:${delay}s;pointer-events:auto;cursor:pointer;" onclick="showCloudDetail('${safeText}','${safeDate}')">${esc(w.text)}</div>`;
     }).join('');
 
   const winsCountLabel = wins.length > 0
@@ -1327,6 +1329,20 @@ const PHOTO_COMMENTS = [
   'この日のこと、忘れないでね。',
   'あの頃の自分に、よくがんばったねって言いたい。',
 ];
+function showCloudDetail(text, date) {
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;padding:24px;';
+  ov.onclick = () => document.body.removeChild(ov);
+  ov.innerHTML = `
+    <div style="background:rgba(255,255,255,0.92);border-radius:20px;padding:24px 28px;max-width:300px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.15);">
+      <div style="font-size:1.6rem;margin-bottom:8px;">☁️</div>
+      <div style="font-size:0.75rem;color:#BBA098;margin-bottom:10px;">${date}</div>
+      <div style="font-size:1rem;color:#5C4033;line-height:1.6;">🌱 ${text}</div>
+      <div style="font-size:0.75rem;color:#BBA098;margin-top:16px;">タップで閉じる</div>
+    </div>`;
+  document.body.appendChild(ov);
+}
+
 function viewPhoto(src, photos, startIdx) {
   photos = photos || [src];
   let idx = startIdx !== undefined ? startIdx : photos.indexOf(src);
