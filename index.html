@@ -1086,7 +1086,7 @@ function screenWelcome() {
     <div class="bubble">${nl2br(C.greetVariants[Math.floor(Math.random()*C.greetVariants.length)])}</div>
     ${startBtn}
     <button class="btn btn-green btn-ghost" style="margin-top:6px;background:white;color:#55A855;border-color:#B5E8B5;" onclick="go(screenTinyWin)">${isEN ? 'Record a small win 🌱' : 'ちいさな頑張りを記録する 🌱'}</button>
-    <a href="privacy.html" style="display:block;margin-top:18px;font-size:0.72rem;color:#BBA098;text-decoration:none;opacity:0.8;">${isEN ? 'Privacy Policy' : 'プライバシーについて'}</a>
+    <button onclick="go(screenPrivacy)" style="display:block;margin-top:18px;font-size:0.72rem;color:#BBA098;text-decoration:none;opacity:0.8;background:none;border:none;cursor:pointer;font-family:inherit;">${isEN ? 'Privacy Policy' : 'プライバシーについて'}</button>
     ${langToggle}
   `;
 }
@@ -2050,6 +2050,148 @@ function checkMilestone(count) {
 
 // ================================================================
 // CALENDAR SCREEN
+// ================================================================
+// PRIVACY SCREEN
+// ================================================================
+function screenPrivacy() {
+  const isEN = LANG === 'en';
+  const content = isEN ? `
+    <p style="font-size:0.88rem;line-height:1.75;margin-bottom:16px;">Thank you for using "Kimochi no Oheya" (the "App"). This Privacy Policy explains how information is handled in the App.</p>
+
+    <h2 style="font-size:0.9rem;font-weight:bold;color:#9ADE9A;margin:0 0 8px;">🔒 Information We Collect</h2>
+    <p style="font-size:0.88rem;line-height:1.75;margin-bottom:6px;">The developer does not collect or obtain any personally identifiable information.</p>
+    <ul style="list-style:none;padding:0;margin-bottom:16px;">
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">· Your mood entries and records are saved <strong>on your device only</strong>.</li>
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">· No information is sent to the developer's servers.</li>
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">· We do not collect names, email addresses, location data, or any personal information.</li>
+    </ul>
+
+    <h2 style="font-size:0.9rem;font-weight:bold;color:#9ADE9A;margin:0 0 8px;">🌸 Data Stored on Your Device</h2>
+    <ul style="list-style:none;padding:0;margin-bottom:16px;">
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">· Positive mood records (text and photos)</li>
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">· Small win records (text)</li>
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">· Visit day count</li>
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">· All data is stored only on your device (localStorage).</li>
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">· Negative mood entries are not saved.</li>
+    </ul>
+
+    <h2 style="font-size:0.9rem;font-weight:bold;color:#9ADE9A;margin:0 0 8px;">📢 Advertising (AdMob)</h2>
+    <div style="background:#F0F4FF;border-left:4px solid #8AB4F8;border-radius:8px;padding:14px 16px;font-size:0.85rem;line-height:1.75;color:#3A4A7A;margin-bottom:16px;">
+      This app uses Google AdMob (Google LLC) advertising services. AdMob may collect the following information for ad delivery:<br><br>
+      · Device identifier (Advertising ID)<br>
+      · IP address<br>
+      · App usage data<br><br>
+      For AdMob's privacy policy, please visit:<br>
+      <a href="https://policies.google.com/privacy" target="_blank" style="color:#9ADE9A;">https://policies.google.com/privacy</a><br><br>
+      You can reset your Advertising ID or change ad personalization settings in your device settings.
+    </div>
+
+    <h2 style="font-size:0.9rem;font-weight:bold;color:#9ADE9A;margin:0 0 8px;">🗑️ How to Delete Your Data</h2>
+    <ul style="list-style:none;padding:0;margin-bottom:16px;">
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">· All app data is stored on your device.</li>
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">· You can delete all records by clearing the app data in your device settings.</li>
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">· Uninstalling the app will also delete all data.</li>
+    </ul>
+
+    <h2 style="font-size:0.9rem;font-weight:bold;color:#9ADE9A;margin:0 0 8px;">👧 Children's Privacy</h2>
+    <p style="font-size:0.88rem;line-height:1.75;margin-bottom:16px;">This app is not intended for children under 13. We do not knowingly collect personal information from children under 13.</p>
+
+    <h2 style="font-size:0.9rem;font-weight:bold;color:#9ADE9A;margin:0 0 8px;">📱 Usage Notes</h2>
+    <ul style="list-style:none;padding:0;margin-bottom:16px;">
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">· Records may be visible to others using the same device and browser.</li>
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">· Clearing device data may also delete your records.</li>
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">· Saving too many photos may reach your device's storage limit.</li>
+    </ul>
+
+    <div style="background:#FFF0EB;border-left:4px solid #F4A68A;border-radius:8px;padding:14px 16px;font-size:0.85rem;line-height:1.75;color:#7A4030;margin-bottom:16px;">
+      This app is for recording feelings and taking a rest.<br>
+      It is not intended for medical treatment, diagnosis, therapy, or counseling.<br><br>
+      If you are in serious distress or feel unsafe, please reach out to someone you trust or a professional support service.
+    </div>
+
+    <h2 style="font-size:0.9rem;font-weight:bold;color:#9ADE9A;margin:0 0 8px;">✉️ Contact</h2>
+    <p style="font-size:0.88rem;line-height:1.75;margin-bottom:6px;">For questions about this Privacy Policy, please contact us:</p>
+    <p style="font-size:0.88rem;line-height:1.75;margin-bottom:16px;">Email: bennrinaginnsann@gmail.com</p>
+
+    <h2 style="font-size:0.9rem;font-weight:bold;color:#9ADE9A;margin:0 0 8px;">📝 Changes to This Policy</h2>
+    <p style="font-size:0.88rem;line-height:1.75;margin-bottom:16px;">This Privacy Policy may be updated as needed. We will notify you of significant changes within the app.</p>
+
+    <p style="font-size:0.78rem;color:#BBA098;margin-bottom:4px;">Last updated: April 25, 2025</p>
+  ` : `
+    <p style="font-size:0.88rem;line-height:1.75;margin-bottom:16px;">「きもちのおへや」をご利用いただきありがとうございます。本プライバシーポリシーは、本アプリにおける情報の取り扱いについて説明するものです。</p>
+
+    <h2 style="font-size:0.9rem;font-weight:bold;color:#9ADE9A;margin:0 0 8px;">🔒 収集する情報について</h2>
+    <p style="font-size:0.88rem;line-height:1.75;margin-bottom:6px;">本アプリは、個人を特定できる情報を開発者が収集・取得することはありません。</p>
+    <ul style="list-style:none;padding:0;margin-bottom:16px;">
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">・入力した気持ちや記録は、<strong>お使いの端末内にのみ</strong>保存されます。</li>
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">・開発者のサーバーへ送信される情報はありません。</li>
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">・氏名・メールアドレス・位置情報などの個人情報は一切収集しません。</li>
+    </ul>
+
+    <h2 style="font-size:0.9rem;font-weight:bold;color:#9ADE9A;margin:0 0 8px;">🌸 端末内に保存されるデータ</h2>
+    <ul style="list-style:none;padding:0;margin-bottom:16px;">
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">・ポジティブな気持ちの記録（テキスト・写真）</li>
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">・ちいさな頑張りの記録（テキスト）</li>
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">・来訪日数のカウント</li>
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">・これらのデータはすべて端末内（localStorage）にのみ保存されます。</li>
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">・ネガティブな気持ちの記録は保存されません。</li>
+    </ul>
+
+    <h2 style="font-size:0.9rem;font-weight:bold;color:#9ADE9A;margin:0 0 8px;">📢 広告について（AdMob）</h2>
+    <div style="background:#F0F4FF;border-left:4px solid #8AB4F8;border-radius:8px;padding:14px 16px;font-size:0.85rem;line-height:1.75;color:#3A4A7A;margin-bottom:16px;">
+      本アプリはGoogle AdMob（Google LLC）の広告サービスを利用しています。AdMobは広告配信のために、以下の情報を収集する場合があります。<br><br>
+      ・デバイス識別子（広告ID）<br>
+      ・IPアドレス<br>
+      ・アプリの使用状況<br><br>
+      AdMobのプライバシーポリシーについては以下をご参照ください。<br>
+      <a href="https://policies.google.com/privacy" target="_blank" style="color:#9ADE9A;">https://policies.google.com/privacy</a><br><br>
+      広告IDのリセットや広告のパーソナライズ設定は、端末の設定から変更できます。
+    </div>
+
+    <h2 style="font-size:0.9rem;font-weight:bold;color:#9ADE9A;margin:0 0 8px;">🗑️ データの削除方法</h2>
+    <ul style="list-style:none;padding:0;margin-bottom:16px;">
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">・アプリ内のデータはすべて端末内に保存されています。</li>
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">・端末の設定からアプリのデータをクリアすることで、すべての記録を削除できます。</li>
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">・アプリをアンインストールすることでも、すべてのデータが削除されます。</li>
+    </ul>
+
+    <h2 style="font-size:0.9rem;font-weight:bold;color:#9ADE9A;margin:0 0 8px;">👧 お子様のプライバシーについて</h2>
+    <p style="font-size:0.88rem;line-height:1.75;margin-bottom:16px;">本アプリは13歳未満のお子様を対象としていません。13歳未満のお子様からの個人情報は意図的に収集しません。</p>
+
+    <h2 style="font-size:0.9rem;font-weight:bold;color:#9ADE9A;margin:0 0 8px;">📱 使用上の注意</h2>
+    <ul style="list-style:none;padding:0;margin-bottom:16px;">
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">・同じ端末・同じブラウザを使う人には記録が見える場合があります。</li>
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">・端末のデータを削除すると、記録も消える場合があります。</li>
+      <li style="font-size:0.88rem;line-height:1.75;padding:4px 0 4px 16px;position:relative;">・写真を保存しすぎると端末の容量上限に達することがあります。</li>
+    </ul>
+
+    <div style="background:#FFF0EB;border-left:4px solid #F4A68A;border-radius:8px;padding:14px 16px;font-size:0.85rem;line-height:1.75;color:#7A4030;margin-bottom:16px;">
+      本アプリは、気持ちを記録したり休んだりするためのものです。<br>
+      医療行為・診断・治療・カウンセリングを目的としたものではありません。<br><br>
+      つらさが強いときや危険を感じるときは、身近な人や専門機関に相談してください。
+    </div>
+
+    <h2 style="font-size:0.9rem;font-weight:bold;color:#9ADE9A;margin:0 0 8px;">✉️ お問い合わせ</h2>
+    <p style="font-size:0.88rem;line-height:1.75;margin-bottom:6px;">本プライバシーポリシーに関するご質問は、以下までご連絡ください。</p>
+    <p style="font-size:0.88rem;line-height:1.75;margin-bottom:16px;">メールアドレス：bennrinaginnsann@gmail.com</p>
+
+    <h2 style="font-size:0.9rem;font-weight:bold;color:#9ADE9A;margin:0 0 8px;">📝 プライバシーポリシーの変更について</h2>
+    <p style="font-size:0.88rem;line-height:1.75;margin-bottom:16px;">本プライバシーポリシーは、必要に応じて更新することがあります。重要な変更がある場合はアプリ内でお知らせします。</p>
+
+    <p style="font-size:0.78rem;color:#BBA098;margin-bottom:4px;">最終更新日：2025年4月25日</p>
+  `;
+  return `
+    <div style="position:fixed;inset:0;z-index:10;background:#FFF8F2;overflow-y:auto;">
+      <div style="max-width:440px;margin:0 auto;padding:28px 20px 60px;">
+        <div style="font-size:1.05rem;font-weight:bold;color:#BBA098;margin-bottom:6px;">きもちのおへや</div>
+        <h1 style="font-size:1.2rem;color:#5C4033;padding-bottom:10px;border-bottom:2px solid #F3E4DC;margin-bottom:16px;">${isEN ? 'Privacy Policy' : 'プライバシーポリシー'}</h1>
+        ${content}
+        <button class="btn btn-ghost" style="margin-top:8px;" onclick="go(screenWelcome)">${isEN ? '← Back' : '← もどる'}</button>
+      </div>
+    </div>
+  `;
+}
+
 // ================================================================
 function screenCalendar() {
   const visits = new Set(loadVisitDays());
