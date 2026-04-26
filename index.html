@@ -687,7 +687,8 @@ body::before {
 
 /* ── 草原画面（ちいさな頑張り） ── */
 .meadow-screen {
-  width:100%; display:flex; flex-direction:column; align-items:center; padding-bottom:24px;
+  width:100%; display:flex; flex-direction:column; align-items:center;
+  height:calc(100vh - 68px);
 }
 .meadow-scene {
   width:100%; max-width:440px; height:200px;
@@ -701,11 +702,12 @@ body::before {
   50%     { transform:rotate(4deg) scaleY(1.06); }
 }
 .meadow-count-label {
-  font-size:0.82rem; color:#5A7A35; margin:14px 0 10px;
+  font-size:0.82rem; color:#5A7A35; margin:14px 0 10px; flex-shrink:0;
   background:#E8F5D0; border-radius:20px; padding:5px 18px;
 }
 .meadow-list {
   width:100%; max-width:360px;
+  flex:1; min-height:0;
   overflow-y:auto; padding:2px 2px 8px;
 }
 
@@ -851,10 +853,61 @@ const CHAR = {
   ],
   posVariants:[
     '本当に良かった！\nあれ、今日輝いてない？\nいい気分だねぇ。ふふ',
+    'よかったねぇ。\nこういう日のきもち、\nとっても大切。',
+    'うれしいな。\nなんだか一緒に\nほっとしちゃう。',
+    'あら、いいじゃない。\n今日みたいな日は\n大事にしましょ。',
+    'そっか、そっかぁ。\nえへへ、なーんか\nにやにやしちゃう。',
+    'そういう気持ち、\n大切にしてね。\nあなたにピッタリよ。',
+    'いい日だったんだねぇ。\nそれって、\nあなたの実力かも。',
+    'んふふ、いいねぇ。\nくわしく\n聞かせてくださいな。',
+    'あらあら、\n今いい感じなのね。\nそういうの、好きよ。',
+    'なんだか\nあったか〜い。\nこういうの、だいじ。だいじ。',
+    'こんな日が\nあってもいいじゃない。\nあたしも一緒に喜ぶから。',
   ],
-  neg:'今のきもち\n聞かせてくれて、ありがとう。\nきもちに向き合うって\n勇気いるじゃない？',
+  negVariants:[
+    '今のきもち、\n聞かせてくれて、ありがとう。\nきもちに向き合うって\n勇気いるじゃない？',
+    'ちゃんと燃やせた？\n消えるまで\nボーッとながめてよっか。',
+    'つらかったね。\nでもまたここに来てくれて、\n嬉しかったんだ。',
+    'スッキリしたね。\n今の時間を、\nだいじ。だいじ。',
+    '焚き火、\n一緒に\n見てよっか。',
+    'きょうも\nほんとうに\nよくがんばったね。',
+    'はき出せたこと、\nそれが本当に\n大切なこと。',
+  ],
   negUnknown:'理由がなくても\nつらいのは本物だよ。\nそのきもち、だいじ。',
 };
+const CHAR_EN = {
+  bc:'#D4A5A5', ac:'#B08080', sc:'#FFB6C1',
+  greetVariants:[
+    "You came.\nTake it easy today, okay?",
+    "Good work today.\nYou can rest here.",
+    "How are you feeling today?\nNo words needed.",
+    "Oh, we met again!\nStay a while, okay?",
+  ],
+  posVariants:[
+    "So glad!\nYou seem bright today. That's a good feeling!",
+    "That's wonderful.\nMoments like these really matter.",
+    "I'm so happy for you.\nI feel warm inside too.",
+    "Oh nice! Days like this\nare worth treasuring.",
+    "I see, I see~ hehe,\nI can't stop smiling.",
+    "Keep that feeling close.\nIt suits you perfectly.",
+    "Sounds like a good day.\nYou made it happen.",
+    "Hehe, love it~\nTell me all about it!",
+    "Oh, you're in a good place.\nI love that.",
+    "So warm~ warm~\nThese moments are precious.",
+    "Days like this are allowed.\nI'll celebrate with you.",
+  ],
+  negVariants:[
+    "Thank you for sharing.\nFacing your feelings takes courage.",
+    "Did you let it burn away?\nLet's watch until it fades.",
+    "That was hard.\nBut I'm glad you came back.",
+    "Feeling a little lighter?\nThis time was precious.",
+    "The campfire.\nShall we watch it together?",
+    "You really worked hard today.\nTruly.",
+    "The fact you let it out—\nthat's the most important thing.",
+  ],
+  negUnknown:"Even without a reason,\nwhat you feel is real.\nYour feelings matter.",
+};
+function getChar() { return LANG === 'en' ? CHAR_EN : CHAR; }
 
 const MOODS = [
   { id:'happy',    label:'嬉しい',       emoji:'😊', type:'pos' },
@@ -870,11 +923,28 @@ const MOODS = [
   { id:'foggy',    label:'なんとなく重い', emoji:'🌫️', type:'neg' },
   { id:'numb',     label:'理由なくつらい', emoji:'😔', type:'neg' },
 ];
+const MOODS_EN = [
+  { id:'happy',    label:'Happy',         emoji:'😊', type:'pos' },
+  { id:'fun',      label:'Joyful',        emoji:'😄', type:'pos' },
+  { id:'proud',    label:'Proud',         emoji:'🌟', type:'pos' },
+  { id:'grateful', label:'Grateful',      emoji:'🙏', type:'pos' },
+  { id:'sad',      label:'Sad',           emoji:'😢', type:'neg' },
+  { id:'nervous',  label:'Nervous',       emoji:'😰', type:'neg' },
+  { id:'angry',    label:'Frustrated',    emoji:'😤', type:'neg' },
+  { id:'tired',    label:'Exhausted',     emoji:'😴', type:'neg' },
+  { id:'anxious',  label:'Anxious',       emoji:'😟', type:'neg' },
+  { id:'lonely',   label:'Lonely',        emoji:'🥺', type:'neg' },
+  { id:'foggy',    label:'Heavy-hearted', emoji:'🌫️', type:'neg' },
+  { id:'numb',     label:'Just hurting',  emoji:'😔', type:'neg' },
+];
+function getMoods() { return LANG === 'en' ? MOODS_EN : MOODS; }
 
 // ================================================================
 // STATE
 // ================================================================
 let S = { mood:null, text:'', tinyText:'', photos:[] };
+let LANG = localStorage.getItem('kimochi_lang') || 'ja';
+function setLang(l) { LANG = l; localStorage.setItem('kimochi_lang', l); go(screenWelcome); }
 let hugHeartInterval = null;
 let calMonth = new Date();
 let fireAudio = null;
@@ -974,19 +1044,26 @@ function growthBarHTML() {
   const icons = '🌸'.repeat(flowers) + '🌱'.repeat(sprouts) || '🌱';
   return `<div class="growth-bar">
     <span class="growth-icons">${icons}</span>
-    <span class="growth-count">${count}個の頑張りが積み重なってるよ</span>
+    <span class="growth-count">${LANG==='en' ? `${count} small wins stacked up!` : `${count}個の頑張りが積み重なってるよ`}</span>
   </div>`;
 }
 
 function screenWelcome() {
   const visitCount = loadVisitDays().length;
   // const alreadyStarted = hasStartedToday(); // TODO: 完成後に制限を戻す
-  const startBtn = `<button class="btn" onclick="startFlow()">はじめる ✨</button>`;
+  const isEN = LANG === 'en';
+  const startBtn = `<button class="btn" onclick="startFlow()">${isEN ? 'Let\'s start ✨' : 'はじめる ✨'}</button>`;
+  const C = getChar();
+  const langToggle = `
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;">
+      <button onclick="setLang('ja')" style="padding:5px 14px;border-radius:20px;border:2px solid ${LANG==='ja'?'#D4A5A5':'#E8D5CC'};background:${LANG==='ja'?'#FFF0F0':'white'};color:#5C4033;font-size:0.78rem;font-weight:${LANG==='ja'?'bold':'normal'};cursor:pointer;font-family:inherit;">日本語</button>
+      <button onclick="setLang('en')" style="padding:5px 14px;border-radius:20px;border:2px solid ${LANG==='en'?'#D4A5A5':'#E8D5CC'};background:${LANG==='en'?'#FFF0F0':'white'};color:#5C4033;font-size:0.78rem;font-weight:${LANG==='en'?'bold':'normal'};cursor:pointer;font-family:inherit;">English</button>
+    </div>`;
   return `
     <div style="text-align:center">
-      <div class="app-title">きもちのおへや</div>
-      <div class="app-sub">気持ちを聞かせてね 🌸</div>
-      <div style="font-size:0.8rem;color:#BBA098;margin-top:4px;">🐾 来た日数：${visitCount}日</div>
+      <div class="app-title">${isEN ? 'My Feelings Room' : 'きもちのおへや'}</div>
+      <div class="app-sub">${isEN ? 'Tell me how you\'re feeling 🌸' : '気持ちを聞かせてね 🌸'}</div>
+      <div style="font-size:0.8rem;color:#BBA098;margin-top:4px;">${isEN ? `🐾 Days visited: ${visitCount}` : `🐾 来た日数：${visitCount}日`}</div>
     </div>
     <div class="char-wrap">
       <div style="position:relative;width:170px;height:170px;">
@@ -1000,18 +1077,69 @@ function screenWelcome() {
         <button onclick="enterDoNothing()" style="position:absolute;bottom:4px;right:-30px;background:none;border:none;cursor:pointer;padding:0;z-index:2;line-height:0;">
           <img src="gazopcsp004.png" width="42" height="42" alt="">
         </button>
+        <button onclick="go(screenBgmSetting)" style="position:absolute;bottom:4px;left:-30px;background:none;border:none;cursor:pointer;padding:0;z-index:2;line-height:0;">
+          <img src="ongaku.png" width="42" height="42" alt="">
+        </button>
       </div>
     </div>
     ${growthBarHTML()}
-    <div class="bubble">${nl2br(CHAR.greetVariants[Math.floor(Math.random()*CHAR.greetVariants.length)])}</div>
+    <div class="bubble">${nl2br(C.greetVariants[Math.floor(Math.random()*C.greetVariants.length)])}</div>
     ${startBtn}
-    <button class="btn btn-green btn-ghost" style="margin-top:6px;background:white;color:#55A855;border-color:#B5E8B5;" onclick="go(screenTinyWin)">ちいさな頑張りを記録する 🌱</button>
-    <a href="privacy.html" style="display:block;margin-top:18px;font-size:0.72rem;color:#BBA098;text-decoration:none;opacity:0.8;">プライバシーについて</a>
+    <button class="btn btn-green btn-ghost" style="margin-top:6px;background:white;color:#55A855;border-color:#B5E8B5;" onclick="go(screenTinyWin)">${isEN ? 'Record a small win 🌱' : 'ちいさな頑張りを記録する 🌱'}</button>
+    <a href="privacy.html" style="display:block;margin-top:18px;font-size:0.72rem;color:#BBA098;text-decoration:none;opacity:0.8;">${isEN ? 'Privacy Policy' : 'プライバシーについて'}</a>
+    ${langToggle}
+  `;
+}
+
+function screenBgmSetting() {
+  const curVol = getBgmVol();
+  const curTrack = getBgmTrack();
+  const isEN = LANG === 'en';
+  const volOpts = [
+    { key:'off',   label: isEN?'Off':'オフ',  icon:'🔇' },
+    { key:'small', label: isEN?'Low':'小',    icon:'🔈' },
+    { key:'mid',   label: isEN?'Mid':'中',    icon:'🔉' },
+    { key:'large', label: isEN?'High':'大',   icon:'🔊' },
+  ];
+  const volBtns = volOpts.map(o => `
+    <button onclick="applyBgmVol('${o.key}');go(screenBgmSetting)"
+      style="display:flex;flex-direction:column;align-items:center;justify-content:center;
+             width:72px;height:72px;border-radius:18px;border:2px solid ${curVol===o.key?'#D4A5A5':'#E8D5CC'};
+             background:${curVol===o.key?'#FFF0F0':'white'};
+             cursor:pointer;font-size:0;gap:4px;box-shadow:0 2px 8px rgba(0,0,0,0.07);">
+      <span style="font-size:1.8rem;">${o.icon}</span>
+      <span style="font-size:0.75rem;color:#5C4033;font-weight:${curVol===o.key?'bold':'normal'};">${o.label}</span>
+    </button>`).join('');
+  const trackBtns = BGM_TRACKS.map(t => `
+    <button onclick="applyBgmTrack('${t.key}');go(screenBgmSetting)"
+      style="display:flex;align-items:center;gap:10px;width:100%;max-width:300px;
+             padding:12px 16px;border-radius:14px;
+             border:2px solid ${curTrack===t.key?'#D4A5A5':'#E8D5CC'};
+             background:${curTrack===t.key?'#FFF0F0':'white'};
+             cursor:pointer;font-family:inherit;text-align:left;
+             box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <span style="font-size:1.3rem;">${curTrack===t.key?'▶️':'🎵'}</span>
+      <span style="font-size:0.83rem;color:#5C4033;font-weight:${curTrack===t.key?'bold':'normal'};line-height:1.4;">${t.label}</span>
+    </button>`).join('');
+  return `
+    <div class="char-wrap" style="margin-bottom:8px;">
+      <div class="char-svg sm">${bearSVG()}</div>
+    </div>
+    <div class="bubble">${isEN ? 'Set your BGM 🎵' : 'BGMの設定をしてね 🎵'}</div>
+    <div style="font-size:0.78rem;color:#9E7B6E;margin-bottom:8px;text-align:center;">${isEN ? '🔊 Volume' : '🔊 音量'}</div>
+    <div style="display:flex;gap:12px;margin-bottom:20px;">
+      ${volBtns}
+    </div>
+    <div style="font-size:0.78rem;color:#9E7B6E;margin-bottom:8px;text-align:center;">${isEN ? '🎶 Title screen music' : '🎶 タイトル画面の音楽'}</div>
+    <div style="display:flex;flex-direction:column;gap:8px;width:100%;align-items:center;margin-bottom:20px;">
+      ${trackBtns}
+    </div>
+    <button class="btn btn-ghost" style="margin-top:4px;" onclick="go(screenWelcome)">${isEN ? 'Back' : 'もどる'}</button>
   `;
 }
 
 function screenMood() {
-  const btns = MOODS.map(m => `
+  const btns = getMoods().map(m => `
     <button class="mood-btn ${m.type}" onclick="pickMood('${m.id}')">
       <span class="m-emoji">${m.emoji}</span>
       <span class="m-label">${m.label}</span>
@@ -1020,19 +1148,23 @@ function screenMood() {
     <div class="char-wrap" style="margin-bottom:8px">
       <div class="char-svg sm">${bearSVG()}</div>
     </div>
-    <div class="bubble">今の気分はどう？</div>
+    <div class="bubble">${LANG==='en' ? 'How are you feeling right now?' : '今の気分はどう？'}</div>
     <div class="mood-grid">${btns}</div>
   `;
 }
 
 function screenInput() {
   const isPos = S.mood.type === 'pos';
+  const isEN = LANG === 'en';
+  const skipNote = isEN
+    ? '<span style="font-size:0.82rem;color:#BBA098">(It\'s okay if you don\'t write anything)</span>'
+    : '<span style="font-size:0.82rem;color:#BBA098">（書かなくても大丈夫だよ）</span>';
   const prompt = isPos
-    ? 'お？なになに？？<br>もっと聞かせてよ！<br><span style="font-size:0.82rem;color:#BBA098">（書かなくても大丈夫だよ）</span>'
-    : 'そっか…。<br>よかったら聞かせてほしいかも。<br><span style="font-size:0.82rem;color:#BBA098">（書かなくても大丈夫だよ）</span>';
+    ? (isEN ? `Oh? What happened??<br>Tell me more!<br>${skipNote}` : `お？なになに？？<br>もっと聞かせてよ！<br>${skipNote}`)
+    : (isEN ? `I see...<br>I'd love to hear, if you'd like.<br>${skipNote}` : `そっか…。<br>よかったら聞かせてほしいかも。<br>${skipNote}`);
   const photoArea = isPos ? `
     <div style="width:100%;max-width:360px;margin-top:6px;">
-      <div style="font-size:0.78rem;color:#BBA098;margin-bottom:5px;">📷 写真も追加できるよ（最大4枚）</div>
+      <div style="font-size:0.78rem;color:#BBA098;margin-bottom:5px;">${isEN ? '📷 Add photos too (up to 4)' : '📷 写真も追加できるよ（最大4枚）'}</div>
       <div class="photo-row" id="photo-row">${renderPhotoSlots()}</div>
       <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="addPhoto(this)">
     </div>` : '';
@@ -1041,12 +1173,12 @@ function screenInput() {
       <div class="char-svg sm">${bearSVG()}</div>
     </div>
     <div class="bubble">${prompt}</div>
-    <textarea class="input-box" id="txt" placeholder="今日のことを書いてみてね..."
+    <textarea class="input-box" id="txt" placeholder="${isEN ? 'Write about today...' : '今日のことを書いてみてね...'}"
       oninput="S.text=this.value">${esc(S.text)}</textarea>
     ${photoArea}
-    <p class="skip-note">※書かなくても「おくる」を押せるよ</p>
-    <button class="btn" onclick="submitText()">おくる ✉️</button>
-    <button class="btn btn-ghost btn-sm" style="margin-top:4px" onclick="go(screenMood)">← 気分を選びなおす</button>
+    <p class="skip-note">${isEN ? '※ You can press "Send" without writing' : '※書かなくても「おくる」を押せるよ'}</p>
+    <button class="btn" onclick="submitText()">${isEN ? 'Send ✉️' : 'おくる ✉️'}</button>
+    <button class="btn btn-ghost btn-sm" style="margin-top:4px" onclick="go(screenMood)">${isEN ? '← Change mood' : '← 気分を選びなおす'}</button>
   `;
 }
 
@@ -1055,13 +1187,21 @@ function screenEffect() {
 }
 
 function screenHug() {
-  const hugMsgs = [
+  const hugMsgsJA = [
     '眠たいのに寝れない？\n寝れるまで一緒にいよっか。',
     'ほんとうにおつかれさま。\n今日はもう、休もっか。',
     '今日はここに来てくれて、\nありがとう。',
     'うまくいかない日も\nあるよね。\nそんな日こそ\n自分を大切にしよ。',
     '今日は、\nもうお休みする？',
   ];
+  const hugMsgsEN = [
+    "Can't sleep even when tired?\nI'll stay right here with you.",
+    "You did so well today.\nLet's rest now.",
+    "Thank you for coming here today.",
+    "Some days just don't go right.\nOn those days, be extra kind to yourself.",
+    "Ready to rest for today?",
+  ];
+  const hugMsgs = LANG === 'en' ? hugMsgsEN : hugMsgsJA;
   const msg = hugMsgs[Math.floor(Math.random()*hugMsgs.length)];
   return `
     <div class="hug-screen" onclick="endHug()">
@@ -1071,24 +1211,24 @@ function screenHug() {
       <div class="hug-bear" style="width:190px;height:190px;">
         ${bearSVG()}
       </div>
-      <p class="hug-tap-hint">タップして進む</p>
+      <p class="hug-tap-hint">${LANG==='en' ? 'Tap to continue' : 'タップして進む'}</p>
     </div>
   `;
 }
 
 function screenMessage() {
   const unknownNeg = (S.mood.id === 'foggy' || S.mood.id === 'numb');
+  const C = getChar();
   const msg = S.mood.type === 'pos'
-            ? CHAR.posVariants[Math.floor(Math.random() * CHAR.posVariants.length)]
-            : unknownNeg ? CHAR.negUnknown
-            : CHAR.neg;
+            ? C.posVariants[Math.floor(Math.random() * C.posVariants.length)]
+            : unknownNeg ? C.negUnknown
+            : C.negVariants[Math.floor(Math.random() * C.negVariants.length)];
   return `
     <div class="char-wrap">
       <div class="char-svg lg">${bearSVG()}</div>
     </div>
     <div class="bubble">${nl2br(msg)}</div>
-    <button class="btn" onclick="resetFlow()">もどる 🏠</button>
-    <button class="btn btn-ghost" style="margin-top:4px" onclick="go(screenMemory)">おもいでの空 ☁️</button>
+    <button class="btn" onclick="resetFlow()">${LANG==='en' ? 'Back 🏠' : 'もどる 🏠'}</button>
   `;
 }
 
@@ -1134,7 +1274,7 @@ function screenMemory() {
 
   const memCards = mems.length === 0
     ? `<div style="text-align:center;padding:28px 0;color:${isNight?'rgba(255,255,255,0.6)':'#BBA098'};font-size:0.9rem;line-height:1.9;">
-        まだ記録がないよ。<br>嬉しいこと・楽しいことを<br>書いてみてね 🌸</div>`
+        ${LANG==='en' ? 'No memories yet.<br>Write about something happy or fun 🌸' : 'まだ記録がないよ。<br>嬉しいこと・楽しいことを<br>書いてみてね 🌸'}</div>`
     : [...mems].reverse().map(m => {
         const photos = m.photos && m.photos.length ? m.photos : [];
         return `
@@ -1146,23 +1286,23 @@ function screenMemory() {
       }).join('');
 
   const winsBtn = wins.length > 0
-    ? `<button onclick="go(screenTinyWinHistory)" style="font-size:0.82rem;color:${isNight?'rgba(200,220,255,0.8)':'#5A7A35'};margin-bottom:8px;background:${isNight?'rgba(255,255,255,0.12)':'#E8F5D0'};border:none;border-radius:20px;padding:6px 18px;cursor:pointer;">🌱 ちいさな頑張り ${wins.length}個</button>`
+    ? `<button onclick="go(screenTinyWinHistory)" style="font-size:0.82rem;color:${isNight?'rgba(200,220,255,0.8)':'#5A7A35'};margin-bottom:8px;background:${isNight?'rgba(255,255,255,0.12)':'#E8F5D0'};border:none;border-radius:20px;padding:6px 18px;cursor:pointer;">${LANG==='en' ? `🌱 Small wins: ${wins.length}` : `🌱 ちいさな頑張り ${wins.length}個`}</button>`
     : '';
 
   return `
     <div class="sky-deco-layer ${skyClass}">${skyDecoHTML()}</div>
     <div class="sky-mem-wrap ${skyClass}">
       <div style="text-align:center;margin-bottom:20px;">
-        <div style="font-size:1.3rem;font-weight:bold;color:${titleColor};">おもいでの空 ☁️</div>
+        <div style="font-size:1.3rem;font-weight:bold;color:${titleColor};">${LANG==='en' ? 'Memory Sky ☁️' : 'おもいでの空 ☁️'}</div>
       </div>
 
       <div style="width:100%;max-width:360px;margin-bottom:6px;">
-        <div style="font-size:0.85rem;font-weight:bold;color:${sectionColor};margin-bottom:8px;">✨ 思い出</div>
+        <div style="font-size:0.85rem;font-weight:bold;color:${sectionColor};margin-bottom:8px;">${LANG==='en' ? '✨ Memories' : '✨ 思い出'}</div>
         ${memCards}
       </div>
 
       ${winsBtn}
-      <button class="btn btn-ghost" style="background:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.5);" onclick="go(screenWelcome)">もどる</button>
+      <button class="btn btn-ghost" style="background:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.5);" onclick="go(screenWelcome)">${LANG==='en' ? 'Back' : 'もどる'}</button>
     </div>
   `;
 }
@@ -1185,16 +1325,22 @@ function screenTinyWinHistory() {
     return `<span style="position:absolute;left:${left}%;bottom:${bottom}px;font-size:${size}rem;animation:flowerSway ${dur}s ease-in-out ${delay}s infinite;">${emoji}</span>`;
   }).join('');
 
-  const phrase =
-    count === 0  ? 'まだ花が咲いていないよ。\n記録すると花が咲くよ 🌱' :
-    count < 5    ? 'ちいさな芽が出てきたよ 🌱' :
-    count < 10   ? 'すこしずつ花が咲いてきた 🌸' :
-    count < 20   ? 'きれいに咲いてきたね 🌼' :
-    count < 30   ? 'たくさんの花が並んでる 🌷' :
-                   '草原いっぱいに咲いてる！ 🌻';
+  const phrase = LANG === 'en'
+    ? (count === 0  ? 'No flowers yet.\nRecord something to make them bloom 🌱' :
+       count < 5    ? 'A tiny sprout appeared 🌱' :
+       count < 10   ? 'Flowers are slowly blooming 🌸' :
+       count < 20   ? 'Beautiful blooms coming in 🌼' :
+       count < 30   ? 'So many flowers lined up 🌷' :
+                      'The whole meadow is blooming! 🌻')
+    : (count === 0  ? 'まだ花が咲いていないよ。\n記録すると花が咲くよ 🌱' :
+       count < 5    ? 'ちいさな芽が出てきたよ 🌱' :
+       count < 10   ? 'すこしずつ花が咲いてきた 🌸' :
+       count < 20   ? 'きれいに咲いてきたね 🌼' :
+       count < 30   ? 'たくさんの花が並んでる 🌷' :
+                      '草原いっぱいに咲いてる！ 🌻');
 
   const listItems = count === 0
-    ? `<div class="mem-empty">まだ記録がないよ 🌱</div>`
+    ? `<div class="mem-empty">${LANG==='en' ? 'No records yet 🌱' : 'まだ記録がないよ 🌱'}</div>`
     : [...wins].reverse().map(w => `
         <div class="tiny-card">
           <div class="tiny-date">${w.date}</div>
@@ -1208,15 +1354,20 @@ function screenTinyWinHistory() {
       </div>
       <div class="meadow-count-label">${phrase}</div>
       <div class="meadow-list">${listItems}</div>
-      <button class="btn btn-ghost" style="margin-top:12px;" onclick="go(screenMemory)">← 空に戻る</button>
+      <button class="btn btn-ghost" style="margin-top:12px;" onclick="go(screenMemory)">${LANG==='en' ? '← Back to sky' : '← 空に戻る'}</button>
     </div>
   `;
 }
 
 function screenTinyWin() {
-  const hints = ['水を飲んだ','外を見た','ごはんを食べた','早起きした',
-                 'お風呂に入れた','好きな音楽を聴いた','ひと休みした',
-                 '今日も起きた','深呼吸した','少し動いた'];
+  const isEN = LANG === 'en';
+  const hintsJA = ['水を飲んだ','外を見た','ごはんを食べた','早起きした',
+                   'お風呂に入れた','好きな音楽を聴いた','ひと休みした',
+                   '今日も起きた','深呼吸した','少し動いた'];
+  const hintsEN = ['Drank water','Got some fresh air','Ate a meal','Woke up early',
+                   'Took a bath/shower','Listened to music','Took a break',
+                   'Got up today','Took a deep breath','Moved a little'];
+  const hints = isEN ? hintsEN : hintsJA;
   const chips = hints.map(h =>
     `<button class="tiny-chip" onclick="fillTinyHint('${h}')">${h}</button>`
   ).join('');
@@ -1225,14 +1376,14 @@ function screenTinyWin() {
       <div class="char-svg sm">${bearSVG()}</div>
     </div>
     <div class="bubble">
-      どんなことができたかな？<br>
-      <span style="font-size:0.82rem;color:#BBA098">どんな小さなことでもいいよ。</span>
+      ${isEN ? "What did you manage to do?<br>" : "どんなことができたかな？<br>"}
+      <span style="font-size:0.82rem;color:#BBA098">${isEN ? "Even the tiniest thing counts." : "どんな小さなことでもいいよ。"}</span>
     </div>
     <div class="tiny-hint">${chips}</div>
-    <textarea class="input-box" id="tiny-txt" placeholder="例）水を飲んだ　外の空気を吸った..."
+    <textarea class="input-box" id="tiny-txt" placeholder="${isEN ? 'e.g.) Drank water  Got some fresh air...' : '例）水を飲んだ　外の空気を吸った...'}"
       oninput="S.tinyText=this.value" style="min-height:88px;border-color:#C8E8C8;"></textarea>
-    <button class="btn btn-green" onclick="submitTinyWin()">ちいさな頑張りを記録する 🌱</button>
-    <button class="btn btn-ghost btn-sm" style="margin-top:4px" onclick="go(screenWelcome)">もどる</button>
+    <button class="btn btn-green" onclick="submitTinyWin()">${isEN ? 'Record my small win 🌱' : 'ちいさな頑張りを記録する 🌱'}</button>
+    <button class="btn btn-ghost btn-sm" style="margin-top:4px" onclick="go(screenWelcome)">${isEN ? 'Back' : 'もどる'}</button>
   `;
 }
 
@@ -1264,12 +1415,10 @@ function screenTinyWinResult(text, count, milestone) {
       <div class="char-svg lg intro">${bearSVG()}</div>
     </div>
     <div class="bubble">
-      ええ！<br>
-      「${esc(text)}」 できたんだね。<br>よかったら<br>ギューしてもいい？
+      ${LANG==='en' ? `Wow!<br>"${esc(text)}"<br>You did it! Can I give you a hug?` : `ええ！<br>「${esc(text)}」 できたんだね。<br>よかったら<br>ギューしてもいい？`}
     </div>
     ${milestoneHTML}
-    <button class="btn" onclick="resetFlow()">もどる 🏠</button>
-    <button class="btn btn-ghost btn-sm" style="margin-top:4px" onclick="go(screenMemory)">おもいでの空 ☁️</button>
+    <button class="btn" onclick="resetFlow()">${LANG==='en' ? 'Back 🏠' : 'もどる 🏠'}</button>
   `;
 }
 
@@ -1283,7 +1432,11 @@ function startFlow() { markStartedToday(); recordVisit(); S.text=''; S.mood=null
 // ================================================================
 function onBearTap() {
   const el = document.querySelector('.char-svg.intro');
-  if (!el || el.classList.contains('bear-pyon')) return;
+  if (!el) return;
+  // bounce-in が再生されないよう、inline で float のみに固定してから pyon を当てる
+  el.style.animation = 'float 3.2s ease-in-out infinite';
+  el.classList.remove('bear-pyon');
+  void el.offsetWidth; // reflow でアニメーションをリセット
   el.classList.add('bear-pyon');
   playPyonSound();
   el.addEventListener('animationend', () => el.classList.remove('bear-pyon'), { once: true });
@@ -1311,7 +1464,7 @@ function playPyonSound() {
 }
 
 function pickMood(id) {
-  S.mood = MOODS.find(m => m.id === id);
+  S.mood = getMoods().find(m => m.id === id) || MOODS.find(m => m.id === id);
   S.text = ''; S.photos = [];
   go(screenInput);
 }
@@ -1556,8 +1709,8 @@ function runFireEffect() {
   ew.style.gap = '12px';
 
   ew.innerHTML = `
-    <p class="effect-note">今のきもち、<br>焚き火にそっとくべてみよ。</p>
-    <div class="bubble bubble-down" style="margin:8px auto 0;">焚き火ってさ、<br>ボーッといつまでも見れない？</div>
+    <p class="effect-note">${LANG==='en' ? 'Your feelings...<br>let them go into the fire.' : '今のきもち、<br>焚き火にそっとくべてみよ。'}</p>
+    <div class="bubble bubble-down" style="margin:8px auto 0;">${LANG==='en' ? 'Campfires...<br>you can stare at them forever, right?' : '焚き火ってさ、<br>ボーッといつまでも見れない？'}</div>
     <div class="fire-scene">
       <div class="fire-letter" id="fire-paper">✉️</div>
       <div class="fire-wrap">
@@ -1574,7 +1727,7 @@ function runFireEffect() {
         </div>
       </div>
     </div>
-    <p class="hug-tap-hint" id="fire-tap" style="opacity:0;transition:opacity 1s;">タップですすむ</p>
+    <p class="hug-tap-hint" id="fire-tap" style="opacity:0;transition:opacity 1s;">${LANG==='en' ? 'Tap to continue' : 'タップですすむ'}</p>
   `;
 
   startFireMusic();
@@ -1624,13 +1777,50 @@ function stopHearts() {
   if (overlay) overlay.style.opacity = '0';
 }
 
+const BGM_VOL_KEY = 'kimochi_bgm_vol';
+const BGM_VOL_MAP = { off:0, small:0.85/4, mid:0.85/2, large:0.85 };
+function getBgmVol() { return localStorage.getItem(BGM_VOL_KEY) || 'mid'; }
+function setBgmVol(v) { localStorage.setItem(BGM_VOL_KEY, v); }
+
+const BGM_TRACK_KEY = 'kimochi_bgm_track';
+const BGM_TRACKS = [
+  { key:'calming',    label:'まいにち、おつかれさま', file:'music_for_video-calming-94427.mp3',                                                     gain:1.0 },
+  { key:'bossa',      label:'おしゃれなカフェきぶん',  file:'musicalmix2020-bossa-nova-summer-instrumental-brazil-7969.mp3',                          gain:1.0 },
+  { key:'barcarolle', label:'ふくざつな日々<br><span style="font-size:0.72rem;opacity:0.8;">（原曲：チャイコフスキー - ピアノ「季節」）</span>', file:'juliush-barcarolle-prelude-tschaikowsky-piano-the-seasons-jahreszeiten-7185.mp3',        gain:1.0 },
+  { key:'clair',      label:'うつくしくなつかしい日々<br><span style="font-size:0.72rem;opacity:0.8;">（原曲：ドビュッシー〜月の光〜）</span>', file:'gregorquendel-debussy-clair-de-lune-l-75-arranged-for-music-box-version-2-228857.mp3',   gain:1.8 },
+];
+function getBgmTrack() { return localStorage.getItem(BGM_TRACK_KEY) || 'calming'; }
+function setBgmTrack(k) { localStorage.setItem(BGM_TRACK_KEY, k); }
+function getBgmTrackObj() {
+  return BGM_TRACKS.find(t => t.key === getBgmTrack()) || BGM_TRACKS[0];
+}
+function calcVolume(volKey) {
+  const base = BGM_VOL_MAP[volKey] ?? 0.5;
+  const gain = getBgmTrackObj().gain;
+  return Math.min(1.0, base * gain);
+}
+
 function startBgMusic() {
+  const vol = getBgmVol();
+  if (vol === 'off') return;
   if (bgAudio) return;
-  bgAudio = new Audio('music_for_video-calming-94427.mp3');
+  bgAudio = new Audio(getBgmTrackObj().file);
   bgAudio.preload = 'none';
   bgAudio.loop = true;
-  bgAudio.volume = 0.5;
+  bgAudio.volume = calcVolume(vol);
   bgAudio.play().catch(() => {});
+}
+function applyBgmVol(v) {
+  setBgmVol(v);
+  if (v === 'off') { stopBgMusic(); return; }
+  if (bgAudio) { bgAudio.volume = calcVolume(v); }
+  else { startBgMusic(); }
+}
+function applyBgmTrack(k) {
+  setBgmTrack(k);
+  const vol = getBgmVol();
+  stopBgMusic();
+  if (vol !== 'off') startBgMusic();
 }
 function stopBgMusic() {
   if (bgAudio) { bgAudio.pause(); bgAudio.currentTime = 0; bgAudio = null; }
@@ -1700,19 +1890,26 @@ function screenDoNothing() {
         <div class="nr-wave two"></div>
         <div class="nr-wave three"></div>
       </div>
-      <div class="nr-footer">戻りたくなったら、そっとタップしてね</div>
+      <div class="nr-footer">${LANG==='en' ? 'Tap gently when you want to go back' : '戻りたくなったら、そっとタップしてね'}</div>
     </div>
   `;
 }
 function enterDoNothing() {
   go(screenDoNothing, () => {
     startWaveMusic();
-    const msgs = [
+    const msgsJA = [
       '何もしない時間って、\nけっこう大事なのよ。',
       '波だけ見てよっか。\n答えはあとでいいよ。',
       'ここでは、\nぼーっとしてるのも\nいい時間。',
       '今日は\n省エネでいこ。',
     ];
+    const msgsEN = [
+      "Having time to do nothing\nis actually pretty important.",
+      "Let's just watch the waves.\nAnswers can wait.",
+      "In here,\nspacing out is\na good use of time.",
+      "Today, let's\ntake it easy.",
+    ];
+    const msgs = LANG === 'en' ? msgsEN : msgsJA;
     const el = document.getElementById('nr-msg');
     if (el) el.innerHTML = nl2br(msgs[Math.floor(Math.random()*msgs.length)]);
   });
@@ -1809,7 +2006,15 @@ function saveTinyWin(text) {
   return wins.length;
 }
 function checkMilestone(count) {
-  const M = {
+  const M = LANG === 'en' ? {
+    1:   { title:'First record!',   msg:'Thank you for writing this down.' },
+    5:   { title:'5 wins!',         msg:"You've got 5 now.\nThey're stacking up!" },
+    10:  { title:'10 wins!',        msg:"10 already.\nStarting to feel at home here?" },
+    20:  { title:'20 wins!',        msg:"20.\nWe've come this far together." },
+    30:  { title:'30 wins!',        msg:"30 wins.\nStep by step is just fine.\n\"A journey of a thousand miles\nbegins with a single step.\"" },
+    50:  { title:'50 wins!',        msg:"50?!\nAlready this many? I'm amazed!!" },
+    100: { title:'100 wins!!',      msg:"100?!\nI'm so happy you've come this far." },
+  } : {
     1:   { title:'はじめての記録',  msg:'記録してくれてありがとう。' },
     5:   { title:'5個達成！',       msg:'5つになったよ。\n積み重なってるねぇ。' },
     10:  { title:'10個達成！',      msg:'10個になったよ。\nここに慣れてきた？' },
@@ -1829,7 +2034,9 @@ function screenCalendar() {
   const today = getTodayStr();
   const y = calMonth.getFullYear();
   const m = calMonth.getMonth();
-  const label = `${y}年${m+1}月`;
+  const label = LANG === 'en'
+    ? new Date(y, m, 1).toLocaleDateString('en-US', {year:'numeric', month:'long'})
+    : `${y}年${m+1}月`;
 
   const firstDow = new Date(y, m, 1).getDay();
   const daysInMonth = new Date(y, m+1, 0).getDate();
@@ -1838,8 +2045,10 @@ function screenCalendar() {
   const isCurrentMonth = (y === now.getFullYear() && m === now.getMonth());
   const nextDisabled = isCurrentMonth ? 'disabled' : '';
 
-  const dowCells = ['日','月','火','水','木','金','土']
-    .map(d => `<div class="cal-dow">${d}</div>`).join('');
+  const dowLabels = LANG === 'en'
+    ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+    : ['日','月','火','水','木','金','土'];
+  const dowCells = dowLabels.map(d => `<div class="cal-dow">${d}</div>`).join('');
   const emptyCells = Array(firstDow).fill('<div class="cal-cell cal-empty"></div>').join('');
 
   let dayCells = '';
@@ -1853,8 +2062,8 @@ function screenCalendar() {
 
   return `
     <div class="mem-header" style="margin-bottom:8px;">
-      <h2>📅 来た日カレンダー</h2>
-      <p style="font-size:0.78rem;color:#BBA098;margin-top:4px;">来た日に 💗 が付くよ</p>
+      <h2>${LANG==='en' ? '📅 Visit Calendar' : '📅 来た日カレンダー'}</h2>
+      <p style="font-size:0.78rem;color:#BBA098;margin-top:4px;">${LANG==='en' ? 'Days you visited get a 💗' : '来た日に 💗 が付くよ'}</p>
     </div>
     <div class="cal-nav">
       <button class="cal-nav-btn" onclick="changeCalMonth(-1)">‹</button>
@@ -1866,7 +2075,7 @@ function screenCalendar() {
       ${emptyCells}
       ${dayCells}
     </div>
-    <button class="btn btn-ghost" style="margin-top:16px" onclick="go(screenWelcome)">もどる</button>
+    <button class="btn btn-ghost" style="margin-top:16px" onclick="go(screenWelcome)">${LANG==='en' ? 'Back' : 'もどる'}</button>
   `;
 }
 
