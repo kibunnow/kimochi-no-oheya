@@ -878,32 +878,32 @@ const CHAR = {
 const CHAR_EN = {
   bc:'#D4A5A5', ac:'#B08080', sc:'#FFB6C1',
   greetVariants:[
-    "You came.\nTake it easy today, okay?",
-    "Good work today.\nYou can rest here.",
-    "How are you feeling today?\nNo words needed.",
-    "Oh, we met again!\nStay a while, okay?",
+    "You came today.\nIt's okay to take it easy, alright?",
+    "You did your best today.\nCome and rest with me.",
+    "How are you feeling today?\nNo need to say anything if you don't want to.",
+    "Oh, we meet again!\nStay as long as you like, okay?",
   ],
   posVariants:[
-    "So glad!\nYou seem bright today. That's a good feeling!",
-    "That's wonderful.\nMoments like these really matter.",
-    "I'm so happy for you.\nI feel warm inside too.",
-    "Oh nice! Days like this\nare worth treasuring.",
-    "I see, I see~ hehe,\nI can't stop smiling.",
-    "Keep that feeling close.\nIt suits you perfectly.",
-    "Sounds like a good day.\nYou made it happen.",
-    "Hehe, love it~\nTell me all about it!",
-    "Oh, you're in a good place.\nI love that.",
+    "I'm so glad!\nYou seem really bright today. I love that feeling!",
+    "That's wonderful.\nMoments like these really matter, don't they?",
+    "I'm so happy for you.\nIt makes me feel warm inside too.",
+    "Oh, that's nice!\nDays like this are worth treasuring.",
+    "Hehe, I can't stop smiling~\nYou look so happy!",
+    "Keep that warm feeling close.\nIt really suits you.",
+    "Sounds like it was a really good day.\nYou made it happen!",
+    "Hehe, I love it~\nTell me all about it!",
+    "Oh, you're in such a good place right now.\nI love that.",
     "So warm~ warm~\nThese moments are precious.",
-    "Days like this are allowed.\nI'll celebrate with you.",
+    "Days like this are wonderful.\nLet's celebrate together!",
   ],
   negVariants:[
     "Thank you for sharing.\nFacing your feelings takes courage.",
-    "Did you let it burn away?\nLet's watch until it fades.",
-    "That was hard.\nBut I'm glad you came back.",
-    "Feeling a little lighter?\nThis time was precious.",
-    "The campfire.\nShall we watch it together?",
+    "Did you let it all burn away?\nLet's watch it fade together.",
+    "That was really hard, wasn't it?\nBut I'm so glad you came here.",
+    "Feeling a little lighter now?\nThis moment was really precious.",
+    "The campfire...\nShall we watch it together for a while?",
     "You really worked hard today.\nTruly.",
-    "The fact you let it out—\nthat's the most important thing.",
+    "The fact that you let it out...\nthat's the most important thing.",
   ],
   negUnknown:"Even without a reason,\nwhat you feel is real.\nYour feelings matter.",
 };
@@ -1123,7 +1123,7 @@ function screenBgmSetting() {
     </button>`).join('');
   return `
     <div class="char-wrap" style="margin-bottom:8px;">
-      <div class="char-svg sm">${bearSVG()}</div>
+      <div class="char-svg sm" style="cursor:pointer;" onclick="onBearTap(this)">${bearSVG()}</div>
     </div>
     <div class="bubble">${isEN ? 'Set your BGM 🎵' : 'BGMの設定をしてね 🎵'}</div>
     <div style="font-size:0.78rem;color:#9E7B6E;margin-bottom:8px;text-align:center;">${isEN ? '🔊 Volume' : '🔊 音量'}</div>
@@ -1157,11 +1157,11 @@ function screenInput() {
   const isPos = S.mood.type === 'pos';
   const isEN = LANG === 'en';
   const skipNote = isEN
-    ? '<span style="font-size:0.82rem;color:#BBA098">(It\'s okay if you don\'t write anything)</span>'
+    ? `<span style="font-size:0.82rem;color:#BBA098">(It's okay if you don't feel like writing anything)</span>`
     : '<span style="font-size:0.82rem;color:#BBA098">（書かなくても大丈夫だよ）</span>';
   const prompt = isPos
-    ? (isEN ? `Oh? What happened??<br>Tell me more!<br>${skipNote}` : `お？なになに？？<br>もっと聞かせてよ！<br>${skipNote}`)
-    : (isEN ? `I see...<br>I'd love to hear, if you'd like.<br>${skipNote}` : `そっか…。<br>よかったら聞かせてほしいかも。<br>${skipNote}`);
+    ? (isEN ? `Oh? What happened?<br>Tell me more if you'd like.<br>${skipNote}` : `お？なになに？？<br>もっと聞かせてよ！<br>${skipNote}`)
+    : (isEN ? `I see...<br>I'd love to hear about it, if you'd like.<br><span style="font-size:0.82rem;color:#BBA098">(It's completely okay if you don't write anything)</span>` : `そっか…。<br>よかったら聞かせてほしいかも。<br>${skipNote}`);
   const photoArea = isPos ? `
     <div style="width:100%;max-width:360px;margin-top:6px;">
       <div style="font-size:0.78rem;color:#BBA098;margin-bottom:5px;">${isEN ? '📷 Add photos too (up to 4)' : '📷 写真も追加できるよ（最大4枚）'}</div>
@@ -1195,11 +1195,11 @@ function screenHug() {
     '今日は、\nもうお休みする？',
   ];
   const hugMsgsEN = [
-    "Can't sleep even when tired?\nI'll stay right here with you.",
+    "Even when you're tired but can't sleep...\nI'll stay right here with you.",
     "You did so well today.\nLet's rest now.",
     "Thank you for coming here today.",
-    "Some days just don't go right.\nOn those days, be extra kind to yourself.",
-    "Ready to rest for today?",
+    "Some days just don't go as planned.\nOn days like that, be extra kind to yourself, okay?",
+    "Ready to rest for today?\nI'm right here.",
   ];
   const hugMsgs = LANG === 'en' ? hugMsgsEN : hugMsgsJA;
   const msg = hugMsgs[Math.floor(Math.random()*hugMsgs.length)];
@@ -1376,7 +1376,7 @@ function screenTinyWin() {
       <div class="char-svg sm">${bearSVG()}</div>
     </div>
     <div class="bubble">
-      ${isEN ? "What did you manage to do?<br>" : "どんなことができたかな？<br>"}
+      ${isEN ? "What was one small thing you managed to do today?<br>" : "どんなことができたかな？<br>"}
       <span style="font-size:0.82rem;color:#BBA098">${isEN ? "Even the tiniest thing counts." : "どんな小さなことでもいいよ。"}</span>
     </div>
     <div class="tiny-hint">${chips}</div>
@@ -1415,7 +1415,7 @@ function screenTinyWinResult(text, count, milestone) {
       <div class="char-svg lg intro">${bearSVG()}</div>
     </div>
     <div class="bubble">
-      ${LANG==='en' ? `Wow!<br>"${esc(text)}"<br>You did it! Can I give you a hug?` : `ええ！<br>「${esc(text)}」 できたんだね。<br>よかったら<br>ギューしてもいい？`}
+      ${LANG==='en' ? `Wow!<br>You ${esc(text)}!<br>You did it! Can I give you a hug?` : `ええ！<br>「${esc(text)}」 できたんだね。<br>よかったら<br>ギューしてもいい？`}
     </div>
     ${milestoneHTML}
     <button class="btn" onclick="resetFlow()">${LANG==='en' ? 'Back 🏠' : 'もどる 🏠'}</button>
@@ -1430,21 +1430,36 @@ function startFlow() { markStartedToday(); recordVisit(); S.text=''; S.mood=null
 // ================================================================
 // クマ タップ演出
 // ================================================================
-function onBearTap() {
-  const el = document.querySelector('.char-svg.intro');
+let _bearAudioCtx = null;
+let _bearTapCooldown = false;
+
+function getAudioCtx() {
+  try {
+    if (!_bearAudioCtx || _bearAudioCtx.state === 'closed') {
+      _bearAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (_bearAudioCtx.state === 'suspended') _bearAudioCtx.resume();
+    return _bearAudioCtx;
+  } catch(e) { return null; }
+}
+
+function onBearTap(passedEl) {
+  // 引数なしはタイトル画面クマ、引数ありはその要素を使う
+  const el = passedEl || document.querySelector('.char-svg.intro');
   if (!el) return;
-  // bounce-in が再生されないよう、inline で float のみに固定してから pyon を当てる
+  // アニメーション付け直し
   el.style.animation = 'float 3.2s ease-in-out infinite';
   el.classList.remove('bear-pyon');
-  void el.offsetWidth; // reflow でアニメーションをリセット
+  void el.offsetWidth;
   el.classList.add('bear-pyon');
-  playPyonSound();
   el.addEventListener('animationend', () => el.classList.remove('bear-pyon'), { once: true });
+  // 連打しても音が途切れないよう毎回鳴らす（AudioCtx 使い回し）
+  playPyonSound();
 }
 function playPyonSound() {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    // ポヨンポヨン：2回バウンス
     [0, 0.28].forEach((delay, i) => {
       const osc  = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -1709,8 +1724,8 @@ function runFireEffect() {
   ew.style.gap = '12px';
 
   ew.innerHTML = `
-    <p class="effect-note">${LANG==='en' ? 'Your feelings...<br>let them go into the fire.' : '今のきもち、<br>焚き火にそっとくべてみよ。'}</p>
-    <div class="bubble bubble-down" style="margin:8px auto 0;">${LANG==='en' ? 'Campfires...<br>you can stare at them forever, right?' : '焚き火ってさ、<br>ボーッといつまでも見れない？'}</div>
+    <p class="effect-note">${LANG==='en' ? 'Your feelings… let them gently go into the fire.' : '今のきもち、<br>焚き火にそっとくべてみよ。'}</p>
+    <div class="bubble bubble-down" style="margin:8px auto 0;">${LANG==='en' ? "Campfires\u2026 you can stare at them forever, can't you?" : '焚き火ってさ、<br>ボーッといつまでも見れない？'}</div>
     <div class="fire-scene">
       <div class="fire-letter" id="fire-paper">✉️</div>
       <div class="fire-wrap">
@@ -1790,12 +1805,12 @@ const BGM_TRACKS = [
   { key:'bossa',      labelJA:'おしゃれなカフェきぶん',
                       labelEN:'Cozy café vibes',
                       file:'musicalmix2020-bossa-nova-summer-instrumental-brazil-7969.mp3', gain:1.0 },
-  { key:'barcarolle', labelJA:'ふくざつな日々<br><span style="font-size:0.72rem;opacity:0.8;">（原曲：チャイコフスキー - ピアノ「季節」/ The Seasons）</span>',
-                      labelEN:'Complicated days<br><span style="font-size:0.72rem;opacity:0.8;">(Original: Tchaikovsky - The Seasons)</span>',
-                      file:'juliush-barcarolle-prelude-tschaikowsky-piano-the-seasons-jahreszeiten-7185.mp3', gain:1.0 },
   { key:'clair',      labelJA:'うつくしくなつかしい日々<br><span style="font-size:0.72rem;opacity:0.8;">（原曲：ドビュッシー〜月の光〜/ Clair de Lune）</span>',
                       labelEN:'Beautiful, nostalgic days<br><span style="font-size:0.72rem;opacity:0.8;">(Original: Debussy - Clair de Lune)</span>',
                       file:'gregorquendel-debussy-clair-de-lune-l-75-arranged-for-music-box-version-2-228857.mp3', gain:1.8 },
+  { key:'barcarolle', labelJA:'ふくざつな日々<br><span style="font-size:0.72rem;opacity:0.8;">（原曲：チャイコフスキー - ピアノ「季節」/ The Seasons）</span>',
+                      labelEN:'Complicated days<br><span style="font-size:0.72rem;opacity:0.8;">(Original: Tchaikovsky - The Seasons)</span>',
+                      file:'juliush-barcarolle-prelude-tschaikowsky-piano-the-seasons-jahreszeiten-7185.mp3', gain:1.0 },
 ];
 // 現在の言語に合ったラベルを返す
 BGM_TRACKS.forEach(t => { Object.defineProperty(t, 'label', { get: () => LANG === 'en' ? t.labelEN : t.labelJA }); });
@@ -1926,10 +1941,11 @@ function enterDoNothing() {
       '今日は\n省エネでいこ。',
     ];
     const msgsEN = [
-      "Having time to do nothing\nis actually pretty important.",
+      "It's okay to do nothing sometimes.\nJust being here is enough.",
+      "Today, let's take it easy.\nYou don't have to do anything.",
       "Let's just watch the waves.\nAnswers can wait.",
-      "In here,\nspacing out is\na good use of time.",
-      "Today, let's\ntake it easy.",
+      "It's okay to space out here.\nThere's no rush.",
+      "You can just be here.\nWatching the waves is plenty.",
     ];
     const msgs = LANG === 'en' ? msgsEN : msgsJA;
     const el = document.getElementById('nr-msg');
@@ -2111,7 +2127,7 @@ function screenPrivacy() {
 
     <h2 style="font-size:0.9rem;font-weight:bold;color:#9ADE9A;margin:0 0 8px;">✉️ Contact</h2>
     <p style="font-size:0.88rem;line-height:1.75;margin-bottom:6px;">For questions about this Privacy Policy, please contact us:</p>
-    <p style="font-size:0.88rem;line-height:1.75;margin-bottom:16px;">Email: bennrinaginnsann@gmail.com</p>
+    <p style="font-size:0.88rem;line-height:1.75;margin-bottom:16px;">Email: kibunnow079@gmail.com</p>
 
     <h2 style="font-size:0.9rem;font-weight:bold;color:#9ADE9A;margin:0 0 8px;">📝 Changes to This Policy</h2>
     <p style="font-size:0.88rem;line-height:1.75;margin-bottom:16px;">This Privacy Policy may be updated as needed. We will notify you of significant changes within the app.</p>
@@ -2173,7 +2189,7 @@ function screenPrivacy() {
 
     <h2 style="font-size:0.9rem;font-weight:bold;color:#9ADE9A;margin:0 0 8px;">✉️ お問い合わせ</h2>
     <p style="font-size:0.88rem;line-height:1.75;margin-bottom:6px;">本プライバシーポリシーに関するご質問は、以下までご連絡ください。</p>
-    <p style="font-size:0.88rem;line-height:1.75;margin-bottom:16px;">メールアドレス：bennrinaginnsann@gmail.com</p>
+    <p style="font-size:0.88rem;line-height:1.75;margin-bottom:16px;">メールアドレス：kibunnow079@gmail.com</p>
 
     <h2 style="font-size:0.9rem;font-weight:bold;color:#9ADE9A;margin:0 0 8px;">📝 プライバシーポリシーの変更について</h2>
     <p style="font-size:0.88rem;line-height:1.75;margin-bottom:16px;">本プライバシーポリシーは、必要に応じて更新することがあります。重要な変更がある場合はアプリ内でお知らせします。</p>
