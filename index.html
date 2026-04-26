@@ -1784,11 +1784,21 @@ function setBgmVol(v) { localStorage.setItem(BGM_VOL_KEY, v); }
 
 const BGM_TRACK_KEY = 'kimochi_bgm_track';
 const BGM_TRACKS = [
-  { key:'calming',    label:'まいにち、おつかれさま', file:'music_for_video-calming-94427.mp3',                                                     gain:1.0 },
-  { key:'bossa',      label:'おしゃれなカフェきぶん',  file:'musicalmix2020-bossa-nova-summer-instrumental-brazil-7969.mp3',                          gain:1.0 },
-  { key:'barcarolle', label:'ふくざつな日々<br><span style="font-size:0.72rem;opacity:0.8;">（原曲：チャイコフスキー - ピアノ「季節」）</span>', file:'juliush-barcarolle-prelude-tschaikowsky-piano-the-seasons-jahreszeiten-7185.mp3',        gain:1.0 },
-  { key:'clair',      label:'うつくしくなつかしい日々<br><span style="font-size:0.72rem;opacity:0.8;">（原曲：ドビュッシー〜月の光〜）</span>', file:'gregorquendel-debussy-clair-de-lune-l-75-arranged-for-music-box-version-2-228857.mp3',   gain:1.8 },
+  { key:'calming',    labelJA:'まいにち、おつかれさま',
+                      labelEN:'Good work today, as always',
+                      file:'music_for_video-calming-94427.mp3', gain:1.0 },
+  { key:'bossa',      labelJA:'おしゃれなカフェきぶん',
+                      labelEN:'Cozy café vibes',
+                      file:'musicalmix2020-bossa-nova-summer-instrumental-brazil-7969.mp3', gain:1.0 },
+  { key:'barcarolle', labelJA:'ふくざつな日々<br><span style="font-size:0.72rem;opacity:0.8;">（原曲：チャイコフスキー - ピアノ「季節」）</span>',
+                      labelEN:'Complicated days<br><span style="font-size:0.72rem;opacity:0.8;">(Original: Tchaikovsky - The Seasons)</span>',
+                      file:'juliush-barcarolle-prelude-tschaikowsky-piano-the-seasons-jahreszeiten-7185.mp3', gain:1.0 },
+  { key:'clair',      labelJA:'うつくしくなつかしい日々<br><span style="font-size:0.72rem;opacity:0.8;">（原曲：ドビュッシー〜月の光〜）</span>',
+                      labelEN:'Beautiful, nostalgic days<br><span style="font-size:0.72rem;opacity:0.8;">(Original: Debussy - Clair de Lune)</span>',
+                      file:'gregorquendel-debussy-clair-de-lune-l-75-arranged-for-music-box-version-2-228857.mp3', gain:1.8 },
 ];
+// 現在の言語に合ったラベルを返す
+BGM_TRACKS.forEach(t => { Object.defineProperty(t, 'label', { get: () => LANG === 'en' ? t.labelEN : t.labelJA }); });
 function getBgmTrack() { return localStorage.getItem(BGM_TRACK_KEY) || 'calming'; }
 function setBgmTrack(k) { localStorage.setItem(BGM_TRACK_KEY, k); }
 function getBgmTrackObj() {
