@@ -1647,12 +1647,12 @@ async function showAdThenHome() {
 function runLetterEffect() {
   const ew = document.getElementById('ew');
   if (!ew) return;
-  const displayText = S.text || 'きもちをおくったよ！';
+  const displayText = S.text || (LANG === 'en' ? 'Your feelings are on their way!' : 'きもちをおくったよ！');
   ew.innerHTML = `
-    <p class="effect-note">きもちが空へ届くよ ✨</p>
+    <p class="effect-note">${LANG === 'en' ? 'Your feelings are reaching the sky ✨' : 'きもちが空へ届くよ ✨'}</p>
     <div class="effect-card" id="lcard">${esc(displayText)}</div>
     <div id="letter-icon">✉️</div>
-    <p class="hug-tap-hint" id="letter-tap" style="opacity:0;transition:opacity 1s;margin-top:16px;">タップですすむ</p>
+    <p class="hug-tap-hint" id="letter-tap" style="opacity:0;transition:opacity 1s;margin-top:16px;">${LANG === 'en' ? 'Tap to continue' : 'タップですすむ'}</p>
   `;
   startLetterMusic();
   document.getElementById('sky-overlay').style.opacity = '1';
