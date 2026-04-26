@@ -1812,8 +1812,14 @@ function startBgMusic() {
 }
 function applyBgmVol(v) {
   setBgmVol(v);
-  if (v === 'off') { stopBgMusic(); return; }
-  if (bgAudio) { bgAudio.volume = calcVolume(v); }
+  const newVol = BGM_VOL_MAP[v] ?? 0;
+  if (v === 'off') {
+    stopBgMusic(); stopFireMusic(); stopLetterMusic(); stopWaveMusic(); return;
+  }
+  if (bgAudio)     { bgAudio.volume     = calcVolume(v); }
+  if (fireAudio)   { fireAudio.volume   = newVol; }
+  if (letterAudio) { letterAudio.volume = newVol; }
+  if (waveAudio)   { waveAudio.volume   = newVol; }
   else { startBgMusic(); }
 }
 function applyBgmTrack(k) {
@@ -1826,35 +1832,41 @@ function stopBgMusic() {
   if (bgAudio) { bgAudio.pause(); bgAudio.currentTime = 0; bgAudio = null; }
 }
 function startFireMusic() {
+  const vol = getBgmVol();
+  if (vol === 'off') return;
   stopBgMusic();
   stopLetterMusic();
   fireAudio = new Audio('restfuldreamingtunes-sounds-for-meditation-rainy-evening-by-the-fireplace-265450.mp3');
   fireAudio.preload = 'none';
   fireAudio.loop = true;
-  fireAudio.volume = 0.65;
+  fireAudio.volume = BGM_VOL_MAP[vol] ?? 0.5;
   fireAudio.play().catch(() => {});
 }
 function stopFireMusic() {
   if (fireAudio) { fireAudio.pause(); fireAudio.currentTime = 0; fireAudio = null; }
 }
 function startLetterMusic() {
+  const vol = getBgmVol();
+  if (vol === 'off') return;
   stopBgMusic();
   stopFireMusic();
   letterAudio = new Audio('clavier-music-calm-classical-piano-291012.mp3');
   letterAudio.preload = 'none';
   letterAudio.loop = true;
-  letterAudio.volume = 0.65;
+  letterAudio.volume = BGM_VOL_MAP[vol] ?? 0.5;
   letterAudio.play().catch(() => {});
 }
 function stopLetterMusic() {
   if (letterAudio) { letterAudio.pause(); letterAudio.currentTime = 0; letterAudio = null; }
 }
 function startWaveMusic() {
+  const vol = getBgmVol();
+  if (vol === 'off') return;
   stopBgMusic();
   waveAudio = new Audio('wave-music.flac');
   waveAudio.preload = 'none';
   waveAudio.loop = true;
-  waveAudio.volume = 0.7;
+  waveAudio.volume = BGM_VOL_MAP[vol] ?? 0.5;
   waveAudio.play().catch(() => {});
 }
 function stopWaveMusic() {
