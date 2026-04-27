@@ -956,7 +956,6 @@ let waveAudio = null;
 // VISIT TRACKING
 // ================================================================
 const VISIT_KEY = 'kimochi_visits_v1';
-const START_KEY = 'kimochi_last_start_v1';
 
 function getTodayStr() {
   const d = new Date();
@@ -974,12 +973,6 @@ function recordVisit() {
     localStorage.setItem(VISIT_KEY, JSON.stringify(days));
   }
   return days.length;
-}
-function hasStartedToday() {
-  return localStorage.getItem(START_KEY) === getTodayStr();
-}
-function markStartedToday() {
-  localStorage.setItem(START_KEY, getTodayStr());
 }
 
 // ================================================================
@@ -1050,7 +1043,6 @@ function growthBarHTML() {
 
 function screenWelcome() {
   const visitCount = loadVisitDays().length;
-  // const alreadyStarted = hasStartedToday(); // TODO: 完成後に制限を戻す
   const isEN = LANG === 'en';
   const startBtn = `<button class="btn" onclick="startFlow()">${isEN ? 'Let\'s start ✨' : 'はじめる ✨'}</button>`;
   const C = getChar();
@@ -1425,7 +1417,7 @@ function screenTinyWinResult(text, count, milestone) {
 // ================================================================
 // FLOW LOGIC
 // ================================================================
-function startFlow() { markStartedToday(); recordVisit(); S.text=''; S.mood=null; S.photos=[]; go(screenMood); }
+function startFlow() { recordVisit(); S.text=''; S.mood=null; S.photos=[]; go(screenMood); }
 
 // ================================================================
 // クマ タップ演出
