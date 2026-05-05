@@ -1333,37 +1333,104 @@ function goEditMem(id) {
   const m = mems.find(m => m.id === id);
   if (!m) return;
   go(() => screenEditMem(m));
+  setTimeout(() => renderEditPhotoArea(id), 50);
 }
 
+let _editMemPhotos = [];
+
 function screenEditMem(m) {
+  _editMemPhotos = [...(m.photos || [])];
   const isNight = getSkyClass() === 'sky-bg-night';
   const bg = isNight ? 'rgba(20,30,60,0.95)' : '#FFF8F2';
   const textColor = isNight ? 'rgba(255,255,255,0.9)' : '#5C4033';
+  const borderColor = isNight ? 'rgba(255,255,255,0.2)' : '#E8D5CC';
+  const sectionBg = isNight ? 'rgba(255,255,255,0.06)' : '#FFF0EB';
   return `
-    <div style="min-height:100vh;background:${bg};display:flex;flex-direction:column;align-items:center;padding:32px 20px;box-sizing:border-box;">
-      <div style="width:100%;max-width:360px;">
+    <div style="min-height:100vh;background:${bg};display:flex;flex-direction:column;align-items:center;padding:28px 20px 40px;box-sizing:border-box;">
+      <div style="width:100%;max-width:360px;display:flex;flex-direction:column;gap:0;">
+
+        <!-- タイトル -->
         <div style="font-size:1.1rem;font-weight:bold;color:${textColor};margin-bottom:4px;">
           ${LANG==='en' ? '✏️ Edit Memory' : '✏️ 思い出を編集'}
         </div>
-        <div style="font-size:0.8rem;color:${isNight?'rgba(255,255,255,0.5)':'#BBA098'};margin-bottom:16px;">
+        <div style="font-size:0.8rem;color:${isNight?'rgba(255,255,255,0.5)':'#BBA098'};margin-bottom:14px;">
           ${m.date} · ${m.moodEmoji} ${m.moodLabel}
         </div>
+
+        <!-- テキスト入力（2倍の高さ） -->
         <textarea id="editMemText"
-          style="width:100%;min-height:120px;padding:12px;border-radius:12px;border:2px solid ${isNight?'rgba(255,255,255,0.2)':'#E8D5CC'};background:${isNight?'rgba(255,255,255,0.08)':'white'};color:${textColor};font-size:0.95rem;font-family:inherit;resize:vertical;box-sizing:border-box;"
+          style="width:100%;min-height:240px;padding:14px;border-radius:12px;border:2px solid ${borderColor};background:${isNight?'rgba(255,255,255,0.08)':'white'};color:${textColor};font-size:0.95rem;font-family:inherit;resize:vertical;box-sizing:border-box;line-height:1.7;"
         >${esc(m.text)}</textarea>
-        <div style="display:flex;gap:10px;margin-top:16px;">
+
+        <!-- 区切り -->
+        <div style="margin:20px 0 12px;font-size:0.85rem;font-weight:bold;color:${isNight?'rgba(255,255,255,0.6)':'#9A7A70'};">
+          ${LANG==='en' ? '🖼️ Photos' : '🖼️ 写真'}
+        </div>
+
+        <!-- 写真エリア -->
+        <div id="editPhotoArea" style="background:${sectionBg};border-radius:12px;padding:14px;min-height:80px;"></div>
+
+        <!-- 写真追加ボタン -->
+        <button onclick="document.getElementById('editPhotoInput').click()"
+          style="margin-top:10px;padding:10px;border-radius:12px;border:2px dashed ${borderColor};background:transparent;color:${isNight?'rgba(255,255,255,0.6)':'#BBA098'};font-size:0.88rem;cursor:pointer;width:100%;">
+          ${LANG==='en' ? '＋ Add photo' : '＋ 写真を追加'}
+        </button>
+        <input type="file" id="editPhotoInput" accept="image/*" multiple style="display:none;"
+          onchange="addEditPhotos(this, ${m.id})">
+
+        <!-- 保存・キャンセル -->
+        <div style="display:flex;gap:10px;margin-top:20px;">
           <button onclick="saveEditMem(${m.id})"
             style="flex:1;padding:12px;border-radius:24px;border:none;background:#F4A68A;color:white;font-size:0.95rem;font-weight:bold;cursor:pointer;">
             ${LANG==='en' ? '💾 Save' : '💾 保存する'}
           </button>
           <button onclick="go(screenMemory)"
-            style="flex:1;padding:12px;border-radius:24px;border:2px solid ${isNight?'rgba(255,255,255,0.2)':'#E8D5CC'};background:transparent;color:${textColor};font-size:0.95rem;cursor:pointer;">
+            style="flex:1;padding:12px;border-radius:24px;border:2px solid ${borderColor};background:transparent;color:${textColor};font-size:0.95rem;cursor:pointer;">
             ${LANG==='en' ? 'Cancel' : 'キャンセル'}
           </button>
         </div>
+
       </div>
     </div>
   `;
+}
+
+function renderEditPhotoArea(memId) {
+  const div = document.getElementById('editPhotoArea');
+  if (!div) return;
+  const isNight = getSkyClass() === 'sky-bg-night';
+  if (_editMemPhotos.length === 0) {
+    div.innerHTML = `<div style="text-align:center;color:${isNight?'rgba(255,255,255,0.35)':'#BBA098'};font-size:0.85rem;padding:12px 0;">${LANG==='en'?'No photos':'写真なし'}</div>`;
+    return;
+  }
+  div.innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:10px;">` +
+    _editMemPhotos.map((p, i) => `
+      <div style="position:relative;width:80px;height:80px;">
+        <img src="${p}" style="width:80px;height:80px;object-fit:cover;border-radius:10px;display:block;">
+        <button onclick="deleteEditPhoto(${i},${memId})"
+          style="position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;border:none;background:#E05050;color:white;font-size:0.7rem;font-weight:bold;cursor:pointer;line-height:1;padding:0;">✕</button>
+      </div>
+    `).join('') + `</div>`;
+}
+
+function deleteEditPhoto(index, memId) {
+  _editMemPhotos.splice(index, 1);
+  renderEditPhotoArea(memId);
+}
+
+function addEditPhotos(input, memId) {
+  const files = Array.from(input.files);
+  let loaded = 0;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      _editMemPhotos.push(e.target.result);
+      loaded++;
+      if (loaded === files.length) renderEditPhotoArea(memId);
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
 }
 
 function saveEditMem(id) {
@@ -1372,8 +1439,14 @@ function saveEditMem(id) {
     alert(LANG === 'en' ? 'Please enter some text.' : 'テキストを入力してください。');
     return;
   }
-  const mems = loadMems().map(m => m.id === id ? {...m, text: newText} : m);
-  localStorage.setItem(MEM_KEY, JSON.stringify(mems));
+  const mems = loadMems().map(m => m.id === id ? {...m, text: newText, photos: [..._editMemPhotos]} : m);
+  try {
+    localStorage.setItem(MEM_KEY, JSON.stringify(mems));
+  } catch(e) {
+    // 容量不足の場合は写真なしで保存
+    const memsNoPhoto = loadMems().map(m => m.id === id ? {...m, text: newText, photos: []} : m);
+    try { localStorage.setItem(MEM_KEY, JSON.stringify(memsNoPhoto)); } catch(e2) {}
+  }
   go(screenMemory);
 }
 
