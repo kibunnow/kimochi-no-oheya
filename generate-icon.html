@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>アイコン生成</title>
+</head>
+<body>
+<p style="font-family:sans-serif;padding:20px;">クマのアイコンを生成中…<br>自動的にダウンロードされます。</p>
+<canvas id="c"></canvas>
+<script>
+function drawBear(ctx, size) {
+  const s = size / 200;
+  ctx.save();
+  ctx.scale(s, s);
+
+  const bc = '#D4A5A5', ac = '#B08080';
+
+  // 背景（丸）
+  ctx.beginPath();
+  ctx.arc(100, 100, 100, 0, Math.PI * 2);
+  ctx.fillStyle = '#FFF8F2';
+  ctx.fill();
+
+  // 耳
+  ctx.beginPath(); ctx.arc(58, 73, 31, 0, Math.PI*2); ctx.fillStyle = bc; ctx.fill();
+  ctx.beginPath(); ctx.arc(142, 73, 31, 0, Math.PI*2); ctx.fillStyle = bc; ctx.fill();
+  ctx.beginPath(); ctx.arc(58, 73, 19, 0, Math.PI*2); ctx.fillStyle = ac; ctx.fill();
+  ctx.beginPath(); ctx.arc(142, 73, 19, 0, Math.PI*2); ctx.fillStyle = ac; ctx.fill();
+
+  // 頭
+  ctx.beginPath(); ctx.arc(100, 118, 77, 0, Math.PI*2); ctx.fillStyle = bc; ctx.fill();
+
+  // 口元
+  ctx.beginPath(); ctx.ellipse(100, 138, 33, 26, 0, 0, Math.PI*2);
+  ctx.fillStyle = ac; ctx.globalAlpha = 0.55; ctx.fill(); ctx.globalAlpha = 1;
+
+  // 目（黒）
+  ctx.beginPath(); ctx.arc(80, 106, 9, 0, Math.PI*2); ctx.fillStyle = '#3D2B1F'; ctx.fill();
+  ctx.beginPath(); ctx.arc(120, 106, 9, 0, Math.PI*2); ctx.fillStyle = '#3D2B1F'; ctx.fill();
+  // 目（白ハイライト）
+  ctx.beginPath(); ctx.arc(83, 103, 3, 0, Math.PI*2); ctx.fillStyle = 'white'; ctx.fill();
+  ctx.beginPath(); ctx.arc(123, 103, 3, 0, Math.PI*2); ctx.fillStyle = 'white'; ctx.fill();
+
+  // 鼻
+  ctx.beginPath(); ctx.ellipse(100, 128, 10, 7, 0, 0, Math.PI*2);
+  ctx.fillStyle = '#3D2B1F'; ctx.fill();
+
+  ctx.restore();
+}
+
+function generate(size, filename) {
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = size;
+  const ctx = cv.getContext('2d');
+  drawBear(ctx, size);
+  const a = document.createElement('a');
+  a.download = filename;
+  a.href = cv.toDataURL('image/png');
+  a.click();
+}
+
+setTimeout(() => generate(512, 'icon-512.png'), 300);
+setTimeout(() => generate(192, 'icon-192.png'), 800);
+setTimeout(() => generate(180, 'icon-180.png'), 1300);
+
+setTimeout(() => {
+  document.body.innerHTML += '<p style="font-family:sans-serif;padding:0 20px;color:green;">✅ 完了！3つのPNGがダウンロードされました。<br>このページは閉じて大丈夫です。</p>';
+}, 1600);
+</script>
+</body>
+</html>

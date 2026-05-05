@@ -223,6 +223,13 @@ body::before {
 }
 .mood-btn:hover  { transform:translateY(-3px); box-shadow:0 6px 16px rgba(0,0,0,0.1); }
 .mood-btn:active { transform:scale(0.96); }
+.icon-btn {
+  transition:transform 0.1s ease, opacity 0.1s ease;
+}
+.icon-btn:active {
+  transform:scale(0.78) !important;
+  opacity:0.65;
+}
 .mood-btn.pos { border-color:#B5EABC; }
 .mood-btn.pos:hover { background:#F0FBF2; }
 .mood-btn.neg { border-color:#FFCCC4; }
@@ -303,7 +310,7 @@ body::before {
   font-size:5rem;
   display:block;
   text-align:center;
-  transition:all 1.6s cubic-bezier(0.25,0.46,0.45,0.94);
+  transition:all 3.2s cubic-bezier(0.25,0.46,0.45,0.94);
 }
 
 /* ── Sparkle ── */
@@ -1059,17 +1066,17 @@ function screenWelcome() {
     </div>
     <div class="char-wrap">
       <div style="position:relative;width:170px;height:170px;">
-        <button onclick="go(screenCalendar)" style="position:absolute;top:4px;left:-30px;background:none;border:none;cursor:pointer;padding:0;z-index:2;line-height:0;">
+        <button class="icon-btn" onclick="go(screenCalendar)" style="position:absolute;top:4px;left:-30px;background:none;border:none;cursor:pointer;padding:0;z-index:2;line-height:0;">
           <img src="karenda25942_color.png" width="42" height="42" alt="">
         </button>
         <div class="char-svg lg intro" style="width:100%;height:100%;" onclick="onBearTap()">${bearSVG()}</div>
-        <button onclick="go(screenMemory)" style="position:absolute;top:4px;right:-30px;background:none;border:none;cursor:pointer;padding:0;z-index:2;line-height:0;">
+        <button class="icon-btn" onclick="go(screenMemory)" style="position:absolute;top:4px;right:-30px;background:none;border:none;cursor:pointer;padding:0;z-index:2;line-height:0;">
           <img src="note12821_color.png" width="42" height="42" alt="">
         </button>
-        <button onclick="enterDoNothing()" style="position:absolute;bottom:4px;right:-30px;background:none;border:none;cursor:pointer;padding:0;z-index:2;line-height:0;">
+        <button class="icon-btn" onclick="enterDoNothing()" style="position:absolute;bottom:4px;right:-30px;background:none;border:none;cursor:pointer;padding:0;z-index:2;line-height:0;">
           <img src="gazopcsp004.png" width="42" height="42" alt="">
         </button>
-        <button onclick="go(screenBgmSetting)" style="position:absolute;bottom:4px;left:-30px;background:none;border:none;cursor:pointer;padding:0;z-index:2;line-height:0;">
+        <button class="icon-btn" onclick="go(screenBgmSetting)" style="position:absolute;bottom:4px;left:-30px;background:none;border:none;cursor:pointer;padding:0;z-index:2;line-height:0;">
           <img src="ongaku.png" width="42" height="42" alt="">
         </button>
       </div>
@@ -1269,9 +1276,18 @@ function screenMemory() {
         ${LANG==='en' ? 'No memories yet.<br>Write about something happy or fun 🌸' : 'まだ記録がないよ。<br>嬉しいこと・楽しいことを<br>書いてみてね 🌸'}</div>`
     : [...mems].reverse().map(m => {
         const photos = m.photos && m.photos.length ? m.photos : [];
+        const btnStyle = isNight
+          ? 'background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.2);'
+          : 'background:rgba(255,255,255,0.8);color:#9A7A70;border:1px solid #E8D5CC;';
         return `
         <div class="sky-card">
-          <div class="sky-card-date">${m.date} · ${m.moodEmoji} ${m.moodLabel}</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">
+            <div class="sky-card-date" style="flex:1;">${m.date} · ${m.moodEmoji} ${m.moodLabel}</div>
+            <div style="display:flex;gap:4px;flex-shrink:0;">
+              <button onclick="goEditMem(${m.id})" style="font-size:0.72rem;padding:3px 8px;border-radius:12px;cursor:pointer;${btnStyle}">✏️ ${LANG==='en'?'Edit':'編集'}</button>
+              <button onclick="confirmDeleteMem(${m.id})" style="font-size:0.72rem;padding:3px 8px;border-radius:12px;cursor:pointer;${btnStyle}">🗑️ ${LANG==='en'?'Delete':'削除'}</button>
+            </div>
+          </div>
           <div class="sky-card-text">${esc(m.text)}</div>
           ${renderMemPhotoGrid(photos, photos)}
         </div>`;
@@ -1297,6 +1313,68 @@ function screenMemory() {
       <button class="btn btn-ghost" style="background:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.5);" onclick="go(screenWelcome)">${LANG==='en' ? 'Back' : 'もどる'}</button>
     </div>
   `;
+}
+
+// ================================================================
+// MEMORY EDIT / DELETE
+// ================================================================
+function confirmDeleteMem(id) {
+  const msg = LANG === 'en'
+    ? 'Delete this memory? This cannot be undone.'
+    : 'この思い出を削除しますか？\n元に戻すことはできません。';
+  if (!confirm(msg)) return;
+  const mems = loadMems().filter(m => m.id !== id);
+  localStorage.setItem(MEM_KEY, JSON.stringify(mems));
+  go(screenMemory);
+}
+
+function goEditMem(id) {
+  const mems = loadMems();
+  const m = mems.find(m => m.id === id);
+  if (!m) return;
+  go(() => screenEditMem(m));
+}
+
+function screenEditMem(m) {
+  const isNight = getSkyClass() === 'sky-bg-night';
+  const bg = isNight ? 'rgba(20,30,60,0.95)' : '#FFF8F2';
+  const textColor = isNight ? 'rgba(255,255,255,0.9)' : '#5C4033';
+  return `
+    <div style="min-height:100vh;background:${bg};display:flex;flex-direction:column;align-items:center;padding:32px 20px;box-sizing:border-box;">
+      <div style="width:100%;max-width:360px;">
+        <div style="font-size:1.1rem;font-weight:bold;color:${textColor};margin-bottom:4px;">
+          ${LANG==='en' ? '✏️ Edit Memory' : '✏️ 思い出を編集'}
+        </div>
+        <div style="font-size:0.8rem;color:${isNight?'rgba(255,255,255,0.5)':'#BBA098'};margin-bottom:16px;">
+          ${m.date} · ${m.moodEmoji} ${m.moodLabel}
+        </div>
+        <textarea id="editMemText"
+          style="width:100%;min-height:120px;padding:12px;border-radius:12px;border:2px solid ${isNight?'rgba(255,255,255,0.2)':'#E8D5CC'};background:${isNight?'rgba(255,255,255,0.08)':'white'};color:${textColor};font-size:0.95rem;font-family:inherit;resize:vertical;box-sizing:border-box;"
+        >${esc(m.text)}</textarea>
+        <div style="display:flex;gap:10px;margin-top:16px;">
+          <button onclick="saveEditMem(${m.id})"
+            style="flex:1;padding:12px;border-radius:24px;border:none;background:#F4A68A;color:white;font-size:0.95rem;font-weight:bold;cursor:pointer;">
+            ${LANG==='en' ? '💾 Save' : '💾 保存する'}
+          </button>
+          <button onclick="go(screenMemory)"
+            style="flex:1;padding:12px;border-radius:24px;border:2px solid ${isNight?'rgba(255,255,255,0.2)':'#E8D5CC'};background:transparent;color:${textColor};font-size:0.95rem;cursor:pointer;">
+            ${LANG==='en' ? 'Cancel' : 'キャンセル'}
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function saveEditMem(id) {
+  const newText = (document.getElementById('editMemText')?.value || '').trim();
+  if (!newText) {
+    alert(LANG === 'en' ? 'Please enter some text.' : 'テキストを入力してください。');
+    return;
+  }
+  const mems = loadMems().map(m => m.id === id ? {...m, text: newText} : m);
+  localStorage.setItem(MEM_KEY, JSON.stringify(mems));
+  go(screenMemory);
 }
 
 // ================================================================
@@ -1654,28 +1732,29 @@ async function showAdThenHome() {
 function runLetterEffect() {
   const ew = document.getElementById('ew');
   if (!ew) return;
-  const displayText = S.text || (LANG === 'en' ? 'Your feelings are on their way!' : 'きもちをおくったよ！');
   ew.innerHTML = `
     <p class="effect-note">${LANG === 'en' ? 'Your feelings are reaching the sky ✨' : 'きもちが空へ届くよ ✨'}</p>
-    <div class="effect-card" id="lcard">${esc(displayText)}</div>
     <div id="letter-icon">✉️</div>
     <p class="hug-tap-hint" id="letter-tap" style="opacity:0;transition:opacity 1s;margin-top:16px;">${LANG === 'en' ? 'Tap to continue' : 'タップですすむ'}</p>
   `;
   startLetterMusic();
   document.getElementById('sky-overlay').style.opacity = '1';
+
+  // 元の700msタイミングでマークを常時昇らせ続ける
+  let sparkleInterval = null;
+  setTimeout(() => {
+    for (let i = 0; i < 16; i++) setTimeout(makeSparkle, i * 85);
+    sparkleInterval = setInterval(() => { makeSparkle(); setTimeout(makeSparkle, 180); }, 650);
+  }, 700);
+
+  // 手紙アイコンは1400ms後にゆっくり昇る
   setTimeout(() => {
     const icon  = document.getElementById('letter-icon');
-    const lcard = document.getElementById('lcard');
     if (icon) {
       icon.style.transform = 'translateY(-280px) scale(0.4) rotate(25deg)';
       icon.style.opacity = '0';
       icon.style.fontSize = '7rem';
     }
-    if (lcard) {
-      lcard.style.opacity = '0';
-      lcard.style.transform = 'translateY(-60px)';
-    }
-    for (let i = 0; i < 28; i++) setTimeout(makeSparkle, i * 85);
     setTimeout(() => {
       const tapHint = document.getElementById('letter-tap');
       if (tapHint) tapHint.style.opacity = '1';
@@ -1684,23 +1763,27 @@ function runLetterEffect() {
         ewEl.style.cursor = 'pointer';
         ewEl.onclick = () => {
           ewEl.onclick = null;
+          if (sparkleInterval) clearInterval(sparkleInterval);
           stopLetterMusic();
           document.getElementById('sky-overlay').style.opacity = '0';
           go(screenMessage);
         };
       }
-    }, 2300);
-  }, 700);
+    }, 4600);
+  }, 1400);
 }
 
 function makeSparkle() {
-  const picks = ['✨','⭐','🌟','💫','✦','＊','·','✸','♡'];
+  const picks = ['✨','🌟','💫','💖','🩷','💛','💙','💜','🩵','⭐','🔆','✦','✸','❋','꩜'];
+  const colors = ['#FFD700','#FF69B4','#87CEEB','#DA70D6','#7FFFD4','#FF6B6B','#B0E0FF','#FFB347','#C8A2C8','#ADFFD6'];
   const el = document.createElement('div');
   el.className = 'sparkle-el';
   el.textContent = picks[Math.floor(Math.random() * picks.length)];
   el.style.left = (8 + Math.random() * 84) + 'vw';
   el.style.top  = (10 + Math.random() * 65) + 'vh';
-  el.style.fontSize = (0.7 + Math.random() * 1.5) + 'rem';
+  el.style.fontSize = (0.8 + Math.random() * 1.6) + 'rem';
+  el.style.color = colors[Math.floor(Math.random() * colors.length)];
+  el.style.textShadow = `0 0 8px ${colors[Math.floor(Math.random() * colors.length)]}, 0 0 16px rgba(255,255,255,0.7)`;
   el.style.animationDuration = (0.8 + Math.random() * 1.1) + 's';
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 2800);
