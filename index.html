@@ -1165,7 +1165,7 @@ function screenInput() {
     <div style="width:100%;max-width:360px;margin-top:6px;">
       <div style="font-size:0.78rem;color:#BBA098;margin-bottom:5px;">${isEN ? '📷 Add photos too (up to 4)' : '📷 写真も追加できるよ（最大4枚）'}</div>
       <div class="photo-row" id="photo-row">${renderPhotoSlots()}</div>
-      <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="addPhoto(this)">
+      <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="addPhoto(this)">
     </div>` : '';
   return `
     <div class="char-wrap" style="margin-bottom:8px">
@@ -1250,16 +1250,25 @@ function skyDecoHTML() {
     return `<span class="sky-deco-item" style="left:${left}%;top:${top}%;animation-duration:${dur}s;animation-delay:${delay}s;">${item}</span>`;
   }).join('');
 }
-function renderMemPhotoGrid(photos, allPhotos) {
+// メモリIDと写真インデックスで拡大表示（base64をonclickに直書きしない）
+const _memPhotoCache = {};
+function viewMemPhoto(memId, idx) {
+  const photos = _memPhotoCache[memId];
+  if (photos) viewPhoto(photos[idx], photos, idx);
+}
+function renderMemPhotoGrid(photos, memId) {
   if (!photos || !photos.length) return '';
-  const srcs = allPhotos || photos;
+  if (memId) _memPhotoCache[memId] = photos;
+  const tap = (i) => memId
+    ? `onclick="viewMemPhoto(${memId},${i})"`
+    : `onclick="viewPhoto('${photos[i]}',[${photos.map(p=>`'${p}'`).join(',')}],${i})"`;
   if (photos.length === 1) {
     return `<div class="photo-grid-solo">
-      <img src="${photos[0]}" alt="写真" onclick="viewPhoto('${photos[0]}',${JSON.stringify(srcs)},0)">
+      <img src="${photos[0]}" alt="写真" ${tap(0)} style="cursor:pointer;">
     </div>`;
   }
   const imgs = photos.map((p, i) =>
-    `<img src="${p}" alt="写真" onclick="viewPhoto('${p}',${JSON.stringify(srcs)},${i})">`
+    `<img src="${p}" alt="写真" ${tap(i)} style="cursor:pointer;">`
   ).join('');
   return `<div class="photo-grid-multi">${imgs}</div>`;
 }
@@ -1289,7 +1298,7 @@ function screenMemory() {
             </div>
           </div>
           <div class="sky-card-text">${esc(m.text)}</div>
-          ${renderMemPhotoGrid(photos, photos)}
+          ${renderMemPhotoGrid(photos, m.id)}
         </div>`;
       }).join('');
 
@@ -1332,8 +1341,7 @@ function goEditMem(id) {
   const mems = loadMems();
   const m = mems.find(m => m.id === id);
   if (!m) return;
-  go(() => screenEditMem(m));
-  setTimeout(() => renderEditPhotoArea(id), 50);
+  go(() => screenEditMem(m), () => renderEditPhotoArea(id));
 }
 
 let _editMemPhotos = [];
@@ -1667,13 +1675,22 @@ function renderPhotoSlots() {
   return html;
 }
 function addPhoto(input) {
-  const file = input.files[0];
-  if (!file || S.photos.length >= 4) return;
+  const files = Array.from(input.files);
   input.value = '';
-  compressImage(file, b64 => {
-    S.photos.push(b64);
-    const row = document.getElementById('photo-row');
-    if (row) row.innerHTML = renderPhotoSlots();
+  if (!files.length) return;
+  // 残り追加可能枚数分だけ処理
+  const remaining = 4 - S.photos.length;
+  const toAdd = files.slice(0, remaining);
+  let loaded = 0;
+  toAdd.forEach(file => {
+    compressImage(file, b64 => {
+      if (S.photos.length < 4) S.photos.push(b64);
+      loaded++;
+      if (loaded === toAdd.length) {
+        const row = document.getElementById('photo-row');
+        if (row) row.innerHTML = renderPhotoSlots();
+      }
+    });
   });
 }
 function removePhoto(idx) {
