@@ -2234,6 +2234,222 @@ function checkMilestone(count) {
 // ================================================================
 // PRIVACY SCREEN
 // ================================================================
+// ================================================================
+// ONBOARDING（初回起動チュートリアル）
+// ================================================================
+const ONBOARD_KEY = 'kimochi_onboarded_v1';
+function hasOnboarded() {
+  return !!localStorage.getItem(ONBOARD_KEY);
+}
+function markOnboarded() {
+  localStorage.setItem(ONBOARD_KEY, '1');
+}
+
+function screenOnboarding(slideIdx) {
+  slideIdx = slideIdx || 0;
+  const isEN = LANG === 'en';
+
+  const slides = isEN ? [
+    {
+      icon: '🌸',
+      big: true,
+      title: 'Welcome to Kimochi no Oheya',
+      text: 'This is a little room for your feelings.\nWrite them down, or don\'t — it\'s entirely up to you.',
+      bear: true,
+    },
+    {
+      icon: '💬',
+      title: 'Share how you\'re feeling',
+      text: 'Tap "Let\'s begin" to tell Kumama how you\'re feeling right now.\nPositive or negative — all feelings are welcome here.',
+      demo: 'start',
+    },
+    {
+      icon: '☁️',
+      title: 'Send happy feelings to the sky',
+      text: 'Positive feelings can be sent to the sky with a photo.\nYou can look back on them anytime in "Memory Sky".',
+      demo: 'sky',
+    },
+    {
+      icon: '🔥',
+      title: 'Burn away heavy feelings',
+      text: 'Difficult feelings and worries\ncan be gently burned in the bonfire and released.',
+      demo: 'fire',
+    },
+    {
+      icon: '🏠',
+      title: 'What you can do at home',
+      text: '',
+      demo: 'icons',
+    },
+    {
+      icon: '🌱',
+      title: 'Record small wins too',
+      text: 'Use the "Record a small win" button for tiny things like\n"I drank water today", "I took a bath".\nEvery little thing counts 🌱',
+      demo: 'wins',
+    },
+    {
+      icon: '🐻',
+      title: 'Kumama is always here',
+      text: 'Come by whenever you feel like it.\nKumama will always be waiting for you 🌸',
+      bear: true,
+      last: true,
+    },
+  ] : [
+    {
+      icon: '🌸',
+      big: true,
+      title: 'きもちのおへやへようこそ',
+      text: 'ここはあなたの気持ちを置いておくお部屋です。\n書くも、書かないも、あなた次第です。',
+      bear: true,
+    },
+    {
+      icon: '💬',
+      title: '気持ちをクーママに伝えよう',
+      text: '「はじめる」を押すと、今の気持ちをクーママに伝えられるよ🐻\nプラスの気持ちも、マイナスの気持ちも、どちらでも大丈夫。',
+      demo: 'start',
+    },
+    {
+      icon: '☁️',
+      title: '嬉しい気持ちは空へ飛ばそう',
+      text: 'プラスの感情は写真といっしょに空に飛ばせるよ✨\nあとから「おもいでの空」でいつでも見返せます。',
+      demo: 'sky',
+    },
+    {
+      icon: '🔥',
+      title: 'つらい気持ちは焚き火へ',
+      text: 'つらい気持ちやモヤモヤは\n焚き火でそっと燃やして、おしまいにできるよ。',
+      demo: 'fire',
+    },
+    {
+      icon: '🏠',
+      title: 'ホーム画面でできること',
+      text: '',
+      demo: 'icons',
+    },
+    {
+      icon: '🌱',
+      title: 'ちいさな頑張りも大切に',
+      text: '「ちいさな頑張りを記録する」ボタンから\nごはんを食べた、お風呂に入れた…\nどんな小さなことでも記録できるよ🌱',
+      demo: 'wins',
+    },
+    {
+      icon: '🐻',
+      title: 'クーママがいつも待ってるよ',
+      text: 'いつでも来てね。\nクーママは、いつもここにいるよ🌸',
+      bear: true,
+      last: true,
+    },
+  ];
+
+  const s = slides[slideIdx];
+  const total = slides.length;
+  const dots = Array.from({length: total}, (_, i) =>
+    `<span style="width:${i===slideIdx?'18px':'8px'};height:8px;border-radius:4px;background:${i===slideIdx?'#F4A68A':'#E8D5CC'};transition:width 0.3s;display:inline-block;"></span>`
+  ).join('');
+
+  // デモコンテンツ
+  let demoHtml = '';
+  if (s.bear) {
+    demoHtml = `<div style="font-size:80px;text-align:center;margin:8px 0;line-height:1;">${bearSVG().replace ? '' : '🐻'}</div>
+    <div style="width:120px;height:120px;margin:0 auto 8px;">${bearSVG()}</div>`;
+  }
+  if (s.demo === 'start') {
+    demoHtml = `
+    <div style="margin:12px auto;display:flex;flex-direction:column;align-items:center;gap:10px;max-width:260px;">
+      <div style="background:white;border-radius:16px;padding:10px 20px;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-size:0.85rem;color:#5C4033;text-align:center;">
+        ${isEN ? '😊 Happy　😢 Sad　😤 Frustrated' : '😊 嬉しい　😢 悲しい　😤 イライラ'}
+      </div>
+      <div style="background:#F4A68A;border-radius:24px;padding:10px 28px;color:white;font-size:0.9rem;font-weight:bold;">
+        ${isEN ? "Let's begin 🌸" : 'はじめる 🌸'}
+      </div>
+    </div>`;
+  }
+  if (s.demo === 'sky') {
+    demoHtml = `
+    <div style="background:linear-gradient(180deg,#B8D8F8 0%,#D4EDFF 100%);border-radius:16px;padding:20px;margin:12px auto;max-width:260px;text-align:center;">
+      <div style="font-size:2rem;">☁️ ☁️ ☁️</div>
+      <div style="font-size:1.8rem;margin:8px 0;">✨ 🌟 💕</div>
+      <div style="font-size:0.78rem;color:#5C8FB8;margin-top:4px;">${isEN ? 'Memory Sky' : 'おもいでの空'}</div>
+    </div>`;
+  }
+  if (s.demo === 'fire') {
+    demoHtml = `
+    <div style="background:linear-gradient(180deg,#1a1a2e 0%,#2d1a0e 100%);border-radius:16px;padding:20px;margin:12px auto;max-width:260px;text-align:center;">
+      <div style="font-size:2.5rem;">🔥</div>
+      <div style="font-size:0.78rem;color:rgba(255,200,100,0.8);margin-top:8px;">${isEN ? 'Burn it away…' : 'そっと燃やして…'}</div>
+    </div>`;
+  }
+  if (s.demo === 'icons') {
+    const iconItems = isEN ? [
+      { img: 'karenda25942_color.png', label: 'Calendar', desc: 'Days you visited get a heart ❤️' },
+      { img: 'note12821_color.png',    label: 'Memory Sky', desc: 'Look back on positive memories ✨' },
+      { img: 'gazopcsp004.png',        label: 'Do Nothing Room', desc: 'Listen to waves and just be 🌊' },
+      { img: 'ongaku.png',             label: 'BGM', desc: 'Change the background music 🎵' },
+    ] : [
+      { img: 'karenda25942_color.png', label: 'カレンダー', desc: '来た日にハートが付くよ ❤️' },
+      { img: 'note12821_color.png',    label: 'おもいでの空', desc: 'プラスの気持ちを見返せるよ ✨' },
+      { img: 'gazopcsp004.png',        label: '何もしない部屋', desc: '波の音を聞きながらぼーっとできるよ 🌊' },
+      { img: 'ongaku.png',             label: 'BGM設定', desc: '好きな音楽に変えられるよ 🎵' },
+    ];
+    demoHtml = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px auto;max-width:300px;">` +
+      iconItems.map(it => `
+        <div style="background:white;border-radius:14px;padding:12px 10px;box-shadow:0 2px 8px rgba(0,0,0,0.07);display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <img src="${it.img}" width="36" height="36" alt="${it.label}">
+          <div style="font-size:0.78rem;font-weight:bold;color:#5C4033;text-align:center;">${it.label}</div>
+          <div style="font-size:0.7rem;color:#9A7A70;text-align:center;line-height:1.4;">${it.desc}</div>
+        </div>`).join('') + `</div>`;
+  }
+  if (s.demo === 'wins') {
+    demoHtml = `
+    <div style="background:white;border-radius:16px;padding:14px 16px;margin:12px auto;max-width:260px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+      <div style="font-size:0.8rem;color:#5A8A35;font-weight:bold;margin-bottom:8px;">🌱 ${isEN ? "Today's small wins" : 'ちいさな頑張り'}</div>
+      ${(isEN
+        ? ['Drank water','Got out of bed','Listened to music']
+        : ['水を飲んだ','今日も起きた','好きな音楽を聴いた']
+      ).map(t => `<div style="font-size:0.78rem;color:#5C4033;padding:3px 0;">✓ ${t}</div>`).join('')}
+    </div>`;
+  }
+
+  const isLast = slideIdx === total - 1;
+  const nextLabel = isLast
+    ? (isEN ? 'Get started 🌸' : 'はじめる 🌸')
+    : (isEN ? 'Next →' : '次へ →');
+
+  return `
+    <div style="min-height:100vh;background:#FFF8F2;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:40px 24px 32px;box-sizing:border-box;">
+
+      <!-- スキップ -->
+      <div style="width:100%;text-align:right;">
+        <button onclick="finishOnboarding()" style="font-size:0.78rem;color:#BBA098;background:none;border:none;cursor:pointer;padding:4px 0;">
+          ${isEN ? 'Skip' : 'スキップ'}
+        </button>
+      </div>
+
+      <!-- メインコンテンツ -->
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;max-width:360px;text-align:center;padding:12px 0;">
+        <div style="font-size:2.6rem;margin-bottom:8px;">${s.icon}</div>
+        <div style="font-size:1.15rem;font-weight:bold;color:#5C4033;margin-bottom:12px;line-height:1.45;">${s.title}</div>
+        ${demoHtml}
+        ${s.text ? `<div style="font-size:0.88rem;color:#7A5C50;line-height:1.85;margin-top:8px;white-space:pre-wrap;">${s.text}</div>` : ''}
+      </div>
+
+      <!-- ドット + ボタン -->
+      <div style="width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center;gap:16px;">
+        <div style="display:flex;gap:6px;align-items:center;">${dots}</div>
+        <button onclick="${isLast ? 'finishOnboarding()' : `go(()=>screenOnboarding(${slideIdx+1}))`}"
+          style="width:100%;padding:14px;border-radius:28px;border:none;background:#F4A68A;color:white;font-size:1rem;font-weight:bold;cursor:pointer;box-shadow:0 3px 12px rgba(244,166,138,0.35);">
+          ${nextLabel}
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function finishOnboarding() {
+  markOnboarded();
+  go(screenWelcome);
+}
+
 function screenPrivacy() {
   const isEN = LANG === 'en';
   const content = isEN ? `
@@ -2444,7 +2660,7 @@ function nl2br(s) { return esc(s).replace(/\n/g,'<br>'); }
 // INIT
 // ================================================================
 recordVisit();
-document.getElementById('app').innerHTML = screenWelcome();
+document.getElementById('app').innerHTML = hasOnboarded() ? screenWelcome() : screenOnboarding(0);
 </script>
 </body>
 </html>
